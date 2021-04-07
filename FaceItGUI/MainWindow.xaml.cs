@@ -118,8 +118,8 @@ namespace FaceItGUI
                                  rcSelect, GraphicsUnit.Pixel);
                          }*/
                         System.Diagnostics.Debug.WriteLine("sending " + actualDirectory + fileName);
-                        WriteToServer(image);
-                        Byte[] data = ReadFromServer();
+                        WriteToServer(image, id, fileName);
+                        byte[] data = ReadFromServer();
                         
                         MemoryStream ms = new MemoryStream(data);
                         System.Drawing.Image img = System.Drawing.Image.FromStream(ms);
@@ -161,22 +161,26 @@ namespace FaceItGUI
 
         }
 
-        public void WriteToServer(Image image, string name)
+        public void WriteToServer(Image image, string name, string fileName)
         {
-
+            name += '\n';
             if (image != null && this.Stream != null)
             {
+                
+                byte[] dataName = Encoding.ASCII.GetBytes(name + "\n" + fileName + "\n");
+                //bytes 0xFF, 0xD9 indicate end of image
+                byte[] dataImage = ImageToByte(image);
+                byte[] bytes = new byte[dataName.Length + dataImage.Length];
+                Buffer.BlockCopy(dataName, 0, bytes, 0, dataName.Length);
+                Buffer.BlockCopy(dataImage, 0, bytes, dataName.Length, dataImage.Length);
+                System.Diagnostics.Debug.WriteLine("data length write: " + bytes.Length);
 
-
-                Byte[] data = ImageToByte(image);
-                System.Diagnostics.Debug.WriteLine("data length write: " + data.Length);
-
-                this.Stream.Write(data, 0, data.Length);
+                this.Stream.Write(bytes, 0, bytes.Length);
 
             }
         }
 
-        public Byte[] ReadFromServer()
+        public byte[] ReadFromServer()
         {
             bool end = false;
             if (this.Stream == null)
@@ -184,21 +188,34 @@ namespace FaceItGUI
                 //this.Error = "First Server!!";
                 return null;
             }
-            Byte[] data = new Byte[1000000];
+            byte[] data = new byte[1000000];
+            string wow = "";
+
             //StringBuilder response = new StringBuilder();
+            int i = 0; 
             while (!end)
             {
                 Stream.Read(data, 0, data.Length);
-                /* response.Append(Encoding.ASCII.GetString(data, 0, data.Length));
-                 for (int i = 0; i < 1024; i++)
-                 {
-                     if (data[i] == '\n')
-                     {
-                         end = true;
-                         break;
-                     }
-                 }*/
-                end = true;
+                for (; i < data.Length; i++)
+                {
+                    System.Diagnostics.Debug.WriteLine("Before if: " + i);
+                    System.Diagnostics.Debug.WriteLine((char)data[i]);
+                    if ((char)data[i] == '\n')
+                    {
+                        System.Diagnostics.Debug.WriteLine("in if: " + i);
+
+                        end = true;
+                        break;
+                    }
+                }
+                
+                System.Diagnostics.Debug.WriteLine("after all: " + i);
+
+                wow = Encoding.ASCII.GetString(data, 0, i);
+                System.Diagnostics.Debug.WriteLine(wow);
+
+                // wow
+                // end = true;
             }
             // return response.ToString();
             System.Diagnostics.Debug.WriteLine("data length read: " + data.Length);
@@ -207,7 +224,7 @@ namespace FaceItGUI
 
         }
 
-        public static Byte[] ImageToByte(System.Drawing.Image iImage)
+        public static byte[] ImageToByte(Image iImage)
         {
             MemoryStream mMemoryStream = new MemoryStream();
             iImage.Save(mMemoryStream, System.Drawing.Imaging.ImageFormat.Jpeg);
