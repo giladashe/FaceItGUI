@@ -134,10 +134,11 @@ namespace FaceItGUI
         }
         public static Image FromRectangle(Rectangle rectangle)
         {
-            Rectangle rect = new Rectangle(0, 0, 100, 100);
             Bitmap bmp = new Bitmap(rectangle.Width, rectangle.Height, PixelFormat.Format32bppArgb);
             Graphics g = Graphics.FromImage(bmp);
-            g.CopyFromScreen(rect.Left, rect.Top, 0, 0, bmp.Size, CopyPixelOperation.SourceCopy);
+            g.CopyFromScreen(rectangle.Left, rectangle.Top, 0, 0, bmp.Size, CopyPixelOperation.SourceCopy);
+            g.Flush();
+            g.Dispose();
             return bmp;
         }
     }
