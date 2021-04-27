@@ -7,9 +7,28 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <Button x:Name="myButton" Click="MyButton_Click">
-            sdfsf
-        </Button>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="5*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Border Background="#2f5cb6"/>
+        <Border Grid.Column ="1" Background="#1f3d7a"/>
+        <Border Grid.Row="1" Grid.ColumnSpan="2" Background="#152951"/>
+        <StackPanel Grid.Column="1" Margin="40,0,0,0" VerticalAlignment="Center">
+            <TextBlock Foreground="White" FontSize="25" Text="Who do you want to snip?"/>
+
+            <Button x:Name="myButton" Click="MyButton_Click" Width="168">
+                me
+            </Button>
+            <TextBox />
+
+            <TextBlock Foreground="White" FontSize="25" Text="Precipitation: 25%"/>
+        </StackPanel>
+
 
     </Grid>
 </Window>
