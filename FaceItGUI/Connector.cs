@@ -26,6 +26,6 @@ namespace FaceItGUI
             this.Port = Convert.ToInt32(ConfigurationManager.AppSettings["Port"]);
         }
 
-        public void ProcessImages()
+        //public void ProcessImages();
     }
 }

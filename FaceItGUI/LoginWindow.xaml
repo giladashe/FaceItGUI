@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:FaceItGUI"
         mc:Ignorable="d"
         Title="SnippingWindow" Height="450" Width="800">
-
+<!--
     <StackPanel Orientation="Vertical" Background="#a6d9ef" Margin="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" >
         <Border CornerRadius="25" Margin="20,10,20,10" BorderBrush="Red" Background="White" Width="330">
             <StackPanel Orientation="Vertical">
@@ -39,5 +39,5 @@ HorizontalContentAlignment="Left"/>
             </StackPanel>
         </Border>
     </StackPanel>
-
+-->
 </Window>
