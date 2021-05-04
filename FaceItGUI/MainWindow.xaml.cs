@@ -130,17 +130,17 @@ namespace FaceItGUI
 
                         long localDate = DateTime.Now.Ticks;
                         int numOfEndLine = 2;
-                        string fileName = "\\" + localDate + ".jpg";
+                        string localDateStr = localDate.ToString();
                         Image image = SnippingTool.FromRectangle(myFrame.Frame);
                         //int j = 1;
-                        while (ImageToByte(image).Length + id.Length + fileName.Length + numOfEndLine > maxUdpDatagramSize)
+                        while (ImageToByte(image).Length + id.Length + localDateStr.Length + numOfEndLine > maxUdpDatagramSize)
                         {
                             // maybe calculate image only at the end!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                             image = ReduceImageSize(0.9, image);
                             // System.Diagnostics.Debug.WriteLine("Height: " + image.Height + " Width: " + image.Width);
                         }
                         //System.Diagnostics.Debug.WriteLine("sending " + actualDirectory + fileName);
-                        WriteToServer(image, id, fileName);
+                        WriteToServer(image, id, localDateStr);
                         // byte[] data = ReadFromServer();
 
                         /*   MemoryStream ms = new MemoryStream(data);
@@ -200,6 +200,7 @@ namespace FaceItGUI
                 Buffer.BlockCopy(dataImage, 0, bytes, dataName.Length, dataImage.Length);
                 //System.Diagnostics.Debug.WriteLine("data length write: " + bytes.Length);
                 //System.Diagnostics.Debug.WriteLine("size is: " + bytes.Length);
+                //udpClient.Send(dataImage, dataImage.Length);
 
                 udpClient.Send(bytes, bytes.Length);
                 var result = await udpClient.ReceiveAsync();
@@ -208,7 +209,7 @@ namespace FaceItGUI
 
                 // udpClient.Close();
                 // this.Stream.Write(bytes, 0, bytes.Length);
-
+                 
             }
         }
         private Image ReduceImageSize(double scaleFactor, Image image)
