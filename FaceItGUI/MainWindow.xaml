@@ -17,16 +17,34 @@
         </Grid.RowDefinitions>
         <Border Background="#2f5cb6"/>
         <Border Grid.Column ="1" Background="#1f3d7a"/>
-        <Border Grid.Row="1" Grid.ColumnSpan="2" Background="#152951"/>
+        <Border Grid.Row="1" Grid.ColumnSpan="2" Background="#152951">
+            <ListBox x:Name="namesList">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="0,2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="100" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" HorizontalAlignment="Center" Text="{Binding Name}" />
+                            <TextBlock Grid.Column="1" HorizontalAlignment="Center" Text="{Binding Feeling}" />
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
         <StackPanel Grid.Column="1" Margin="40,0,0,0" VerticalAlignment="Center">
             <TextBlock Foreground="White" FontSize="25" Text="Who do you want to snip?"/>
 
-            <Button x:Name="myButton" Click="MyButton_Click" Width="168">
+            <Button x:Name="meButton" Click="MyButton_Click" Width="168">
                 me
             </Button>
-            <TextBox />
+            <TextBox  x:Name="nameBox" />
 
-            <TextBlock Foreground="White" FontSize="25" Text="Precipitation: 25%"/>
+            <TextBlock Foreground="White" FontSize="25" Text="Want to snip other?"/>
+            <Button x:Name="myButton" Click="MyButton_Click" Width="168">
+                press after writing name
+            </Button>
         </StackPanel>
 
 

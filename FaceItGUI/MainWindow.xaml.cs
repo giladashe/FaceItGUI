@@ -18,6 +18,7 @@ using System.Drawing;
 using System.Net.Sockets;
 using System.Configuration;
 using System.Drawing.Drawing2D;
+using System.ComponentModel;
 
 namespace FaceItGUI
 {
@@ -30,19 +31,28 @@ namespace FaceItGUI
         private bool stop = false;
         private string[] names = { "Gilad", "Israel", "Yossi" };
         private string currentName;
+        private readonly string userName = "wowow";
+        private Dictionary<string, string> namesMap; 
+
         private UdpClient Client;
         volatile Boolean Stop;
         private NetworkStream Stream;
+        private List<NameInList> items;
 
         private int Port;
         private string Ip;
         public MainWindow()
         {
             InitializeComponent();
+            // need to take the username from previous screen
             this.Client = null;
             this.Stop = false;
             this.Ip = ConfigurationManager.AppSettings["Ip"];
             this.Port = Convert.ToInt32(ConfigurationManager.AppSettings["Port"]);
+            this.namesMap = new Dictionary<string, string>(); 
+            // items = new List<NameInList>();
+            //items.Add(new NameInList() { Name = "Yossi", Feeling = "" });
+            //namesList.ItemsSource = items;
             /*this.Client = new UdpClient();
             Client.Connect(Ip, Port);*/
 
@@ -96,31 +106,55 @@ namespace FaceItGUI
               }
           }*/
 
-        private void MyButton_Click(object sender, RoutedEventArgs e)
+
+        public async Task<int> AddToNamesList(string name)
         {
-            int maxUdpDatagramSize = 65515;
-            string path = Directory.GetCurrentDirectory();
-            string screenshotsDirectory = path + "\\Screenshots";
-            if (!Directory.Exists(path))
+            namesMap.Add(currentName, currentName);
+            int index = 0;
+            await Dispatcher.BeginInvoke(new Action(delegate ()
             {
-                Directory.CreateDirectory(screenshotsDirectory);
+                index = namesList.Items.Add(new NameInList() { Name = currentName, Feeling = "" });
+            }));
+
+            //int index = await namesList.Items.Add(new NameInList() { Name = currentName, Feeling = "" });
+            return index;
+        }
+
+        private async void MyButton_Click(object sender, RoutedEventArgs e)
+        {
+            var button = (System.Windows.Controls.Button)sender;
+            currentName = (button.Name == "meButton") ? userName : nameBox.Text;
+            // items.Add(new NameInList() { Name = currentName, Feeling = "" });
+            if (namesMap.ContainsKey(currentName)){
+                System.Diagnostics.Debug.WriteLine(currentName + " already exists");
+                return;
             }
+            /* namesMap.Add(currentName, currentName);
+             int index = namesList.Items.Add(new NameInList() { Name = currentName, Feeling = "" });*/
+            int index = await AddToNamesList(currentName);
+            int maxUdpDatagramSize = 65515;
+            //string mainDir = MakeScreenShotDirectory();
             this.ShowActivated = false;
             this.Hide();
             Thread.Sleep(300);
             var myFrame = SnippingTool.Snip();
 
+            if (currentName == userName)
+            {
+                currentName = "Y" + currentName;
+            }
+            else
+            {
+                currentName = "N" + currentName;
+            }
+
             new Thread(delegate ()
             {
                 // a little depends that row 52 will be executed before other snippinig tool capture
-                string id = names[i];
-                i++;
+                //string id = names[i];
+                //i++;
                 //var currentSnip = myFrame.Clone();
-                var actualDirectory = screenshotsDirectory + "\\" + id;
-                if (!Directory.Exists(actualDirectory))
-                {
-                    Directory.CreateDirectory(actualDirectory);
-                }
+                //string currentDir = MakeSpecificDirectory(mainDir, currentName);
                 while (!stop)
                 {
                     // take picture every 0.5 second !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -129,18 +163,18 @@ namespace FaceItGUI
                     {
 
                         long localDate = DateTime.Now.Ticks;
-                        int numOfEndLine = 2;
+                        int numOfEndLines = 2;
                         string localDateStr = localDate.ToString();
                         Image image = SnippingTool.FromRectangle(myFrame.Frame);
                         //int j = 1;
-                        while (ImageToByte(image).Length + id.Length + localDateStr.Length + numOfEndLine > maxUdpDatagramSize)
+                        while (ImageToByte(image).Length + currentName.Length + localDateStr.Length + numOfEndLines > maxUdpDatagramSize)
                         {
                             // maybe calculate image only at the end!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                             image = ReduceImageSize(0.9, image);
                             // System.Diagnostics.Debug.WriteLine("Height: " + image.Height + " Width: " + image.Width);
                         }
                         //System.Diagnostics.Debug.WriteLine("sending " + actualDirectory + fileName);
-                        WriteToServer(image, id, localDateStr);
+                        WriteToServer(image, currentName, localDateStr, index);
                         // byte[] data = ReadFromServer();
 
                         /*   MemoryStream ms = new MemoryStream(data);
@@ -183,7 +217,30 @@ namespace FaceItGUI
 
         }
 
-        public async void WriteToServer(Image image, string name, string fileName)
+
+        private string MakeScreenShotDirectory()
+        {
+            string path = Directory.GetCurrentDirectory();
+            string screenshotsDirectory = path + "\\Screenshots";
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(screenshotsDirectory);
+            }
+            return screenshotsDirectory;
+        }
+
+        private string MakeSpecificDirectory(string mainDir, string name)
+        {
+            var actualDirectory = mainDir + "\\" + name;
+            if (!Directory.Exists(actualDirectory))
+            {
+                Directory.CreateDirectory(actualDirectory);
+            }
+            return actualDirectory;
+        }
+
+
+        public async void WriteToServer(Image image, string name, string fileName, int index)
         {
             if (image != null)
             {
@@ -205,11 +262,23 @@ namespace FaceItGUI
                 udpClient.Send(bytes, bytes.Length);
                 var result = await udpClient.ReceiveAsync();
                 var message = Encoding.ASCII.GetString(result.Buffer, 0, result.Buffer.Length);
+                //(NameInList)(namesList.Items.GetItemAt(index)).Feeling = message;
+                //namesList.();
+                //NameInList myName = (NameInList)namesList.Items[index];
+                //myName.Feeling = message;
+                await Dispatcher.BeginInvoke(new Action(delegate ()
+                {
+                    ((NameInList)namesList.Items[index]).Feeling = message;
+                    NameInList name = (NameInList)namesList.Items[index];
+                    System.Diagnostics.Debug.WriteLine(name.Name + ": "+ name.Feeling);
+                    //namesList.Items[index] = myName;
+                }));
+                //listBox1.Items.Add(thisFile.ToString());
                 System.Diagnostics.Debug.WriteLine(message);
 
                 // udpClient.Close();
                 // this.Stream.Write(bytes, 0, bytes.Length);
-                 
+
             }
         }
         private Image ReduceImageSize(double scaleFactor, Image image)
@@ -275,6 +344,29 @@ namespace FaceItGUI
             MemoryStream mMemoryStream = new MemoryStream();
             iImage.Save(mMemoryStream, System.Drawing.Imaging.ImageFormat.Jpeg);
             return mMemoryStream.ToArray();
+        }
+    }
+    public class NameInList: INotifyPropertyChanged
+    {
+        private string _feeling;
+
+        public string Name { get; set; }
+        public string Feeling {
+            get
+            {
+                return _feeling;
+            }
+            set
+            {
+                _feeling = value;
+                NotifyPropertyChanged("Feeling");
+            }
+        }
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void NotifyPropertyChanged(String info)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(info));
         }
     }
 }
