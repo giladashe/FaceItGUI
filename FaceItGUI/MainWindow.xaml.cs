@@ -27,29 +27,30 @@ namespace FaceItGUI
     /// </summary>
     public partial class MainWindow : Window
     {
-        private int i = 0;
+        //private int i = 0;
         private bool stop = false;
-        private string[] names = { "Gilad", "Israel", "Yossi" };
+        //private string[] names = { "Gilad", "Israel", "Yossi" };
         private string currentName;
-        private readonly string userName = "wowow";
+        private readonly string userName;
         private Dictionary<string, string> namesMap; 
 
-        private UdpClient Client;
+       /* private UdpClient Client;
         volatile Boolean Stop;
         private NetworkStream Stream;
-        private List<NameInList> items;
+        private List<NameInList> items;*/
 
         private int Port;
         private string Ip;
-        public MainWindow()
+        public MainWindow(string userName)
         {
             InitializeComponent();
             // need to take the username from previous screen
-            this.Client = null;
-            this.Stop = false;
+            /*this.Client = null;
+            this.Stop = false;*/
             this.Ip = ConfigurationManager.AppSettings["Ip"];
             this.Port = Convert.ToInt32(ConfigurationManager.AppSettings["Port"]);
-            this.namesMap = new Dictionary<string, string>(); 
+            this.namesMap = new Dictionary<string, string>();
+            this.userName = userName;
             // items = new List<NameInList>();
             //items.Add(new NameInList() { Name = "Yossi", Feeling = "" });
             //namesList.ItemsSource = items;
@@ -125,12 +126,13 @@ namespace FaceItGUI
             var button = (System.Windows.Controls.Button)sender;
             currentName = (button.Name == "meButton") ? userName : nameBox.Text;
             // items.Add(new NameInList() { Name = currentName, Feeling = "" });
-            if (namesMap.ContainsKey(currentName)){
+            if (namesMap.ContainsKey(currentName))
+            {
                 System.Diagnostics.Debug.WriteLine(currentName + " already exists");
                 return;
             }
-            /* namesMap.Add(currentName, currentName);
-             int index = namesList.Items.Add(new NameInList() { Name = currentName, Feeling = "" });*/
+            namesMap.Add(currentName, currentName);
+            //int index = namesList.Items.Add(new NameInList() { Name = currentName, Feeling = "" });
             int index = await AddToNamesList(currentName);
             int maxUdpDatagramSize = 65515;
             //string mainDir = MakeScreenShotDirectory();
@@ -177,15 +179,15 @@ namespace FaceItGUI
                         WriteToServer(image, currentName, localDateStr, index);
                         // byte[] data = ReadFromServer();
 
-                        /*   MemoryStream ms = new MemoryStream(data);
-                           System.Drawing.Image img = System.Drawing.Image.FromStream(ms);
-                           //System.Diagnostics.Debug.WriteLine("got the image: " + actualDirectory + fileName);*/
+                        /*MemoryStream ms = new MemoryStream(data);
+                        System.Drawing.Image img = System.Drawing.Image.FromStream(ms);*/
+                        //System.Diagnostics.Debug.WriteLine("got the image: " + actualDirectory + fileName);
                         //                      System.Diagnostics.Debug.WriteLine("width: " + image.Width + " Height: " +image.Height);
 
                         // image.Save(actualDirectory + fileName, System.Drawing.Imaging.ImageFormat.Jpeg);
                         //System.Diagnostics.Debug.WriteLine(fileName + " sent");
 
-                        /*if (bmp != null)
+                       /* if (bmp != null)
                         {
                             bmp.Save("myImage" + i + ".png");
                             // Do something with the bitmap
@@ -295,7 +297,7 @@ namespace FaceItGUI
             return thumbnailImg;
         }
 
-        public byte[] ReadFromServer()
+       /* public byte[] ReadFromServer()
         {
             bool end = false;
             if (this.Stream == null)
@@ -337,7 +339,7 @@ namespace FaceItGUI
 
             return data;
 
-        }
+        }*/
 
         public static byte[] ImageToByte(Image iImage)
         {
@@ -346,27 +348,5 @@ namespace FaceItGUI
             return mMemoryStream.ToArray();
         }
     }
-    public class NameInList: INotifyPropertyChanged
-    {
-        private string _feeling;
-
-        public string Name { get; set; }
-        public string Feeling {
-            get
-            {
-                return _feeling;
-            }
-            set
-            {
-                _feeling = value;
-                NotifyPropertyChanged("Feeling");
-            }
-        }
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        private void NotifyPropertyChanged(String info)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(info));
-        }
-    }
+    
 }
