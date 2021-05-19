@@ -34,8 +34,8 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="2*" />
                             </Grid.ColumnDefinitions>
-                            <TextBlock FontSize="30" Grid.Column="0" HorizontalAlignment="Left" Text="{Binding Name}" />
-                            <TextBlock FontSize="30" Grid.Column="1" HorizontalAlignment="Right" Text="{Binding Feeling}" />
+                            <TextBlock FontSize="30" Grid.Column="0" HorizontalAlignment="Center" Text="{Binding Name, StringFormat='{}{0}\ - '}" />
+                            <TextBlock FontSize="30" Grid.Column="1" HorizontalAlignment="Center" Text="{Binding Feeling}" />
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>

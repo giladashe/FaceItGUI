@@ -355,10 +355,15 @@ namespace FaceItGUI
                     {
                         PropertyInfo[] properties = typeof(Behaviors).GetProperties();
                         int maxPropertyValue = -1;
-                        PropertyInfo maxProperty = properties[0];
+                        PropertyInfo maxProperty = (properties[0].Name != "Match") ? properties[0] : properties[1];
                         foreach (PropertyInfo property in properties)
                         {
+                            if (property.Name == "Match")
+                            {
+                                continue;
+                            }
                             int propertyValue = (int)property.GetValue(allBehaviors[name]);
+                            
                             if (propertyValue > maxPropertyValue)
                             {
                                 maxPropertyValue = propertyValue;
