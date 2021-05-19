@@ -19,16 +19,42 @@ using System.Net.Sockets;
 using System.Configuration;
 using System.Drawing.Drawing2D;
 using System.ComponentModel;
-
-
+using System.Windows.Controls;
+using System.Reflection;
 
 namespace FaceItGUI
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    /// Interaction logic for Page1.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class ConversationPage : Page
     {
+        private LoginWindow parentWindow;
+        private MainWindowPage mainWinPage;
+        private Dictionary<string, Behaviors> allBehaviors;
+
+        public ConversationPage(LoginWindow loginWindow, MainWindowPage main, string userName)
+        {
+            InitializeComponent();
+            this.parentWindow = loginWindow;
+            this.mainWinPage = main;
+            // need to take the username from previous screen
+            /*this.Client = null;
+            this.Stop = false;*/
+            this.Ip = ConfigurationManager.AppSettings["Ip"];
+            this.Port = Convert.ToInt32(ConfigurationManager.AppSettings["Port"]);
+            this.namesMap = new Dictionary<string, string>();
+            this.userName = userName;
+            allBehaviors = new Dictionary<string, Behaviors>();
+            // items = new List<NameInList>();
+            //items.Add(new NameInList() { Name = "Yossi", Feeling = "" });
+            //namesList.ItemsSource = items;
+            /*this.Client = new UdpClient();
+            Client.Connect(Ip, Port);*/
+
+
+            //Connect(Ip,port);
+        }
         //private int i = 0;
         private bool stop = false;
         //private string[] names = { "Gilad", "Israel", "Yossi" };
@@ -43,25 +69,7 @@ namespace FaceItGUI
 
         private int Port;
         private string Ip;
-        public MainWindow(string userName)
-        {
-            InitializeComponent();
-            // need to take the username from previous screen
-            /*this.Client = null;
-            this.Stop = false;*/
-            this.Ip = ConfigurationManager.AppSettings["Ip"];
-            this.Port = Convert.ToInt32(ConfigurationManager.AppSettings["Port"]);
-            this.namesMap = new Dictionary<string, string>();
-            this.userName = userName;
-            // items = new List<NameInList>();
-            //items.Add(new NameInList() { Name = "Yossi", Feeling = "" });
-            //namesList.ItemsSource = items;
-            /*this.Client = new UdpClient();
-            Client.Connect(Ip, Port);*/
 
-
-            //Connect(Ip,port);
-        }
         /*    public void Connect(string ip, int port)
             {
                 try
@@ -113,6 +121,7 @@ namespace FaceItGUI
         public async Task<int> AddToNamesList(string name)
         {
             namesMap.Add(currentName, currentName);
+            allBehaviors.Add(name, new Behaviors());
             int index = 0;
             await Dispatcher.BeginInvoke(new Action(delegate ()
             {
@@ -136,13 +145,17 @@ namespace FaceItGUI
             //namesMap.Add(currentName, currentName);
             //int index = namesList.Items.Add(new NameInList() { Name = currentName, Feeling = "" });
             int index = await AddToNamesList(currentName);
+
             int maxUdpDatagramSize = 65515;
             //string mainDir = MakeScreenShotDirectory();
-            this.ShowActivated = false;
-            this.Hide();
+            this.parentWindow.ShowActivated = false;
+            this.parentWindow.Hide();
             Thread.Sleep(300);
             var myFrame = SnippingTool.Snip();
-
+            if (myFrame == null)
+            {
+                return;
+            }
             if (currentName == userName)
             {
                 currentName = "Y" + currentName;
@@ -154,6 +167,7 @@ namespace FaceItGUI
 
             new Thread(delegate ()
             {
+                int round = 0;
                 // a little depends that row 52 will be executed before other snippinig tool capture
                 //string id = names[i];
                 //i++;
@@ -162,14 +176,15 @@ namespace FaceItGUI
                 while (!stop)
                 {
                     // take picture every 0.5 second !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                    Thread.Sleep(1000);
+                    Thread.Sleep(500);
+
                     try
                     {
 
                         long localDate = DateTime.Now.Ticks;
                         int numOfEndLines = 2;
                         string localDateStr = localDate.ToString();
-                        Image image = SnippingTool.FromRectangle(myFrame.Frame);
+                        System.Drawing.Image image = SnippingTool.FromRectangle(myFrame.Frame);
                         //int j = 1;
                         while (ImageToByte(image).Length + currentName.Length + localDateStr.Length + numOfEndLines > maxUdpDatagramSize)
                         {
@@ -178,7 +193,8 @@ namespace FaceItGUI
                             // System.Diagnostics.Debug.WriteLine("Height: " + image.Height + " Width: " + image.Width);
                         }
                         //System.Diagnostics.Debug.WriteLine("sending " + actualDirectory + fileName);
-                        WriteToServer(image, currentName, localDateStr, index);
+                        WriteToServer(image, currentName, localDateStr, index, round);
+                        round++;
                         // byte[] data = ReadFromServer();
 
                         /*MemoryStream ms = new MemoryStream(data);
@@ -205,8 +221,8 @@ namespace FaceItGUI
 
 
             }).Start();
-            WindowState = WindowState.Minimized;
-            this.Show();
+            this.parentWindow.WindowState = WindowState.Minimized;
+            this.parentWindow.Show();
             // string folderPath = Server.MapPath("~/ImagesFolder/");  //Create a Folder in your Root directory on your solution.
             // string fileName = "~/screenshots/IMageName.jpg";
             /*string imagePath = folderPath + fileName;
@@ -225,12 +241,14 @@ namespace FaceItGUI
         public void StopButton_Click(object sender, RoutedEventArgs e)
         {
             this.stop = true;
-            
             // todo send to Israel!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            LoginWindow logWin = new LoginWindow();
-            logWin.Show();
-            this.Close();
-              
+
+            this.parentWindow.Content = mainWinPage;
+
+
+            /*logWin.Show();
+            this.Close();*/
+
         }
 
 
@@ -256,7 +274,7 @@ namespace FaceItGUI
         }
 
 
-        public async void WriteToServer(Image image, string name, string fileName, int index)
+        public async void WriteToServer(System.Drawing.Image image, string name, string fileName, int index, int round)
         {
             if (image != null)
             {
@@ -278,17 +296,67 @@ namespace FaceItGUI
                 udpClient.Send(bytes, bytes.Length);
                 var result = await udpClient.ReceiveAsync();
                 var message = Encoding.ASCII.GetString(result.Buffer, 0, result.Buffer.Length);
+                await Dispatcher.BeginInvoke(new Action(delegate ()
+                {
+                    // remove 'Y'/'N'
+                    name = name.Substring(1);
+
+                    switch (message)
+                    {
+                        case "sad":
+                            allBehaviors[name].Sad++;
+                            break;
+                        case "happy":
+                            allBehaviors[name].Happy++;
+                            break;
+                        case "surprise":
+                            allBehaviors[name].Surprise++;
+                            break;
+                        case "angry":
+                            allBehaviors[name].Angry++;
+                            break;
+                        case "disgust":
+                            allBehaviors[name].Disgust++;
+                            break;
+                        case "fear":
+                            allBehaviors[name].Fear++;
+                            break;
+                        default:
+                            break;
+                    }
+
+                    if (round!=0 && round % 20 == 0)
+                    {
+                        PropertyInfo[] properties = typeof(Behaviors).GetProperties();
+                        int maxPropertyValue = -1;
+                        PropertyInfo maxProperty = properties[0];
+                        foreach (PropertyInfo property in properties)
+                        {
+                            int propertyValue = (int)property.GetValue(allBehaviors[name]);
+                            if (propertyValue > maxPropertyValue)
+                            {
+                                maxPropertyValue = propertyValue;
+                                maxProperty = property;
+                                property.SetValue(allBehaviors[name], 0);
+                            }
+
+                        }
+
+                        ((NameInList)namesList.Items[index]).Feeling = maxProperty.Name.ToLower();
+                        NameInList myName = (NameInList)namesList.Items[index];
+                        System.Diagnostics.Debug.WriteLine(myName.Name + ": " + myName.Feeling);
+                        //namesList.Items[index] = myName;
+
+                    }
+                }));
+
                 //(NameInList)(namesList.Items.GetItemAt(index)).Feeling = message;
                 //namesList.();
                 //NameInList myName = (NameInList)namesList.Items[index];
                 //myName.Feeling = message;
-                await Dispatcher.BeginInvoke(new Action(delegate ()
-                {
-                    ((NameInList)namesList.Items[index]).Feeling = message;
-                    NameInList name = (NameInList)namesList.Items[index];
-                    System.Diagnostics.Debug.WriteLine(name.Name + ": " + name.Feeling);
-                    //namesList.Items[index] = myName;
-                }));
+
+
+
                 //listBox1.Items.Add(thisFile.ToString());
                 System.Diagnostics.Debug.WriteLine(message);
 
@@ -297,7 +365,7 @@ namespace FaceItGUI
 
             }
         }
-        private Image ReduceImageSize(double scaleFactor, Image image)
+        private System.Drawing.Image ReduceImageSize(double scaleFactor, System.Drawing.Image image)
         {
             var newWidth = (int)(image.Width * scaleFactor);
             var newHeight = (int)(image.Height * scaleFactor);
@@ -355,12 +423,11 @@ namespace FaceItGUI
 
          }*/
 
-        public static byte[] ImageToByte(Image iImage)
+        public static byte[] ImageToByte(System.Drawing.Image iImage)
         {
             MemoryStream mMemoryStream = new MemoryStream();
             iImage.Save(mMemoryStream, System.Drawing.Imaging.ImageFormat.Jpeg);
             return mMemoryStream.ToArray();
         }
     }
-
 }

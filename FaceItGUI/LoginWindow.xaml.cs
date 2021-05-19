@@ -17,7 +17,7 @@ namespace FaceItGUI
     /// <summary>
     /// Interaction logic for SnippingWindow.xaml
     /// </summary>
-    public partial class SnippingWindow : Window
+    public partial class LoginWindow : Window
     {
         private int Port;
         private string Ip;
@@ -27,7 +27,7 @@ namespace FaceItGUI
 
 
 
-        public SnippingWindow()
+        public LoginWindow()
         {
             InitializeComponent();
             this.Ip = ConfigurationManager.AppSettings["Ip"];
@@ -37,24 +37,27 @@ namespace FaceItGUI
 
         public void btnLogin_Click_1(object sender, RoutedEventArgs e)
         {
-            //take username and password
+
+           //take username and password
             string userName = txtUserName.Text;
             string password = txtPassword.Password;
-            // check userName and password
-            this.Hide();
-            MainWindow mainWin = new MainWindow(userName);
+            // todo: check userName and password and send to israel
+            this.Content = new MainWindowPage(this, userName);
+
+            /*MainWindow mainWin = new MainWindow(userName);
             mainWin.Show();
-            this.Show();
+            this.Close();*/
             //Stream.Write()
         }
 
 
         public void btnRegister_Click(object sender, RoutedEventArgs e)
         {
-            RegisterWindow registerWin = new RegisterWindow();
-            registerWin.Show();
+            this.Content = new RegisterPage(this);
+           /* RegisterWindow registerWin = new RegisterWindow();
+            registerWin.Show();*/
         }
-        public void Connect(string ip, int port)
+        /*public void Connect(string ip, int port)
         {
             try
             {
@@ -80,6 +83,6 @@ namespace FaceItGUI
                 this.Client.Dispose();
                 this.Client.Close();
             }
-        }
+        }*/
     }
 }
