@@ -32,6 +32,20 @@ namespace FaceItGUI
         private LoginWindow parentWindow;
         private MainWindowPage mainWinPage;
         private Dictionary<string, Behaviors> allBehaviors;
+        //private int i = 0;
+        private bool stop = false, startCheck = false;
+        //private string[] names = { "Gilad", "Israel", "Yossi" };
+        private string currentName;
+        private readonly string userName;
+        private Dictionary<string, string> namesMap;
+
+        /* private UdpClient Client;
+         volatile Boolean Stop;
+         private NetworkStream Stream;
+         private List<NameInList> items;*/
+
+        private int Port;
+        private string Ip;
 
         public ConversationPage(LoginWindow loginWindow, MainWindowPage main, string userName)
         {
@@ -55,20 +69,7 @@ namespace FaceItGUI
 
             //Connect(Ip,port);
         }
-        //private int i = 0;
-        private bool stop = false;
-        //private string[] names = { "Gilad", "Israel", "Yossi" };
-        private string currentName;
-        private readonly string userName;
-        private Dictionary<string, string> namesMap;
 
-        /* private UdpClient Client;
-         volatile Boolean Stop;
-         private NetworkStream Stream;
-         private List<NameInList> items;*/
-
-        private int Port;
-        private string Ip;
 
         /*    public void Connect(string ip, int port)
             {
@@ -152,6 +153,7 @@ namespace FaceItGUI
             this.parentWindow.Hide();
             Thread.Sleep(300);
             var myFrame = SnippingTool.Snip();
+            bool isLoginUser = false;
             if (myFrame == null)
             {
                 return;
@@ -159,15 +161,24 @@ namespace FaceItGUI
             if (currentName == userName)
             {
                 currentName = "Y" + currentName;
+                isLoginUser = true;
+                meButton.Visibility = Visibility.Hidden;
+                snipMeTxt.Visibility = Visibility.Hidden;
+                othersTxt.Visibility = Visibility.Visible;
+                nameBox.Visibility = Visibility.Visible;
+                othersButton.Visibility = Visibility.Visible;
+
             }
             else
             {
                 currentName = "N" + currentName;
+                checkMatchBtn.Visibility = Visibility.Visible;
             }
 
             new Thread(delegate ()
             {
                 int round = 0;
+                string thisName = currentName;
                 // a little depends that row 52 will be executed before other snippinig tool capture
                 //string id = names[i];
                 //i++;
@@ -180,20 +191,21 @@ namespace FaceItGUI
 
                     try
                     {
-
+                        
                         long localDate = DateTime.Now.Ticks;
                         int numOfEndLines = 2;
                         string localDateStr = localDate.ToString();
                         System.Drawing.Image image = SnippingTool.FromRectangle(myFrame.Frame);
                         //int j = 1;
-                        while (ImageToByte(image).Length + currentName.Length + localDateStr.Length + numOfEndLines > maxUdpDatagramSize)
+                        while (ImageToByte(image).Length + thisName.Length + localDateStr.Length + numOfEndLines > maxUdpDatagramSize)
                         {
                             // maybe calculate image only at the end!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                             image = ReduceImageSize(0.9, image);
                             // System.Diagnostics.Debug.WriteLine("Height: " + image.Height + " Width: " + image.Width);
                         }
                         //System.Diagnostics.Debug.WriteLine("sending " + actualDirectory + fileName);
-                        WriteToServer(image, currentName, localDateStr, index, round);
+                        WriteToServer(image, thisName, localDateStr, index, round, isLoginUser);
+
                         round++;
                         // byte[] data = ReadFromServer();
 
@@ -274,7 +286,7 @@ namespace FaceItGUI
         }
 
 
-        public async void WriteToServer(System.Drawing.Image image, string name, string fileName, int index, int round)
+        public async void WriteToServer(System.Drawing.Image image, string name, string fileName, int index, int round, bool isLoginUser)
         {
             if (image != null)
             {
@@ -300,7 +312,8 @@ namespace FaceItGUI
                 {
                     // remove 'Y'/'N'
                     name = name.Substring(1);
-
+                    bool goodVibe = false;
+                    bool neutral = false;
                     switch (message)
                     {
                         case "sad":
@@ -308,9 +321,11 @@ namespace FaceItGUI
                             break;
                         case "happy":
                             allBehaviors[name].Happy++;
+                            goodVibe = true;
                             break;
                         case "surprise":
                             allBehaviors[name].Surprise++;
+                            goodVibe = true;
                             break;
                         case "angry":
                             allBehaviors[name].Angry++;
@@ -321,11 +336,22 @@ namespace FaceItGUI
                         case "fear":
                             allBehaviors[name].Fear++;
                             break;
+                        case "neutral":
+                            allBehaviors[name].Neutral++;
+                            neutral = true;
+                            break;
                         default:
                             break;
                     }
+                    if (startCheck)
+                    {
+                        // check matching to others every 20 seconds (40 * 0.5 seconds)
+                        bool needToCheck = (isLoginUser && round % 30 == 0) ? true : false;
+                        AddAndCheckMatch(name, neutral, goodVibe, isLoginUser, needToCheck);
+                    }
 
-                    if (round!=0 && round % 20 == 0)
+
+                    if (round % 20 == 0)
                     {
                         PropertyInfo[] properties = typeof(Behaviors).GetProperties();
                         int maxPropertyValue = -1;
@@ -377,6 +403,59 @@ namespace FaceItGUI
             var imageRectangle = new Rectangle(0, 0, newWidth, newHeight);
             thumbGraph.DrawImage(image, imageRectangle);
             return thumbnailImg;
+        }
+
+
+        public void CheckMatchOnClick(object sender, RoutedEventArgs e)
+        {
+            othersButton.Visibility = Visibility.Hidden;
+            othersTxt.Visibility = Visibility.Hidden;
+            nameBox.Visibility = Visibility.Hidden;
+            checkMatchBtn.Visibility = Visibility.Hidden;
+            othersButton.Visibility = Visibility.Hidden;
+            startCheck = true;
+        }
+
+        public void AddAndCheckMatch(string name, bool neutral, bool goodVibe, bool isLoginUser, bool needToCheck)
+        {
+            if (!neutral)
+            {
+                if (goodVibe)
+                {
+                    allBehaviors[name].Match++;
+                }
+                else
+                {
+                    allBehaviors[name].Match--;
+                }
+            }
+            if (isLoginUser && needToCheck)
+            {
+                int userVibe = allBehaviors[name].Match;
+                allBehaviors[name].Match = 0;
+                int sumMatch = 0;
+                int diff = 5;
+                foreach (var behavior in allBehaviors)
+                {
+                    if (behavior.Key != name)
+                    {
+                        sumMatch += behavior.Value.Match;
+                        behavior.Value.Match = 0;
+                    }
+                }
+                int avgMatch = sumMatch / allBehaviors.Count;
+
+                if (Math.Abs(userVibe - avgMatch) <= diff)
+                {
+                    //good match
+                    matchText.Text = "You match your\n interlocutors :)";
+                }
+                else
+                {
+                    //bad match
+                    matchText.Text = "You need to adjust your\n behaviors to the\n conversation!";
+                }
+            }
         }
 
         /* public byte[] ReadFromServer()

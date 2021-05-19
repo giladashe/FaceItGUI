@@ -17,7 +17,13 @@
             <RowDefinition Height="2*"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Border Background="#2f5cb6"/>
+        <Border Background="#2f5cb6">
+            <StackPanel>
+                <Button x:Name="checkMatchBtn" Click="CheckMatchOnClick" 
+                Content="Check matching" Visibility="Hidden"/>
+                <TextBlock x:Name="matchText" HorizontalAlignment="Center" Foreground="White" FontSize="25" Text=""/>
+            </StackPanel>
+        </Border>
         <Border Grid.Column ="1" Background="#1f3d7a"/>
         <Border Grid.Row="1" Grid.ColumnSpan="2" Background="#152951" >
             <ListBox x:Name="namesList" >
@@ -36,15 +42,15 @@
             </ListBox>
         </Border>
         <StackPanel Grid.Column="1" Margin="40,0,0,0" VerticalAlignment="Center">
-            <TextBlock HorizontalAlignment="Center" Foreground="White" FontSize="25" Text="Who do you want to snip?"/>
-
+            <TextBlock HorizontalAlignment="Center" Foreground="White" FontSize="25" Text="Welcome To FaceIt!"/>
+            <TextBlock x:Name="snipMeTxt" HorizontalAlignment="Center" Foreground="White" FontSize="25" Text="Please snip yourself!"/>
             <Button x:Name="meButton" Click="MyButton_Click" Width="168">
-                me
+                snip my video
             </Button>
-            <TextBox  x:Name="nameBox" />
+            <TextBlock x:Name="othersTxt" HorizontalAlignment="Center" Foreground="White" FontSize="25" Text="Want to snip others?" Visibility="Hidden"/>
+            <TextBox  x:Name="nameBox" Visibility="Hidden"/>
 
-            <TextBlock Foreground="White" FontSize="25" Text="Want to snip others?"/>
-            <Button x:Name="othersButton" Click="MyButton_Click" Width="168">
+            <Button x:Name="othersButton" Click="MyButton_Click" Width="168" Visibility="Hidden">
                 press after writing name
             </Button>
             <Button x:Name="stopButton" Click="StopButton_Click" Width="168" 
