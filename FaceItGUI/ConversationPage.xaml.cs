@@ -134,7 +134,11 @@ namespace FaceItGUI
                 //namesListBorder.get
                 //namesList.ItemContainerStyle.
                 namesMap.TryAdd(name, name);
-                allBehaviors.TryAdd(name, new Behaviors());
+                Behaviors behaviors = new Behaviors
+                {
+                    CheckMatch = true
+                };
+                allBehaviors.TryAdd(name, behaviors);
                 missesRecognition.TryAdd(name, 0);
                 int index = 0;
                 await Dispatcher.BeginInvoke(new Action(delegate ()
@@ -177,7 +181,7 @@ namespace FaceItGUI
                     currentName = nameBox.Text;
                 }));
             }
-
+            nameBox.Text = string.Empty;
             // items.Add(new NameInList() { Name = currentName, Feeling = "" });
             if (namesMap.ContainsKey(currentName))
             {
@@ -407,44 +411,33 @@ namespace FaceItGUI
                     {
                         // remove 'Y'/'N'
                         name = name.Substring(1);
-                        bool goodVibe = false;
-                        bool neutral = false;
-                        switch (message)
+                        bool goodVibe = (message == "happy" || message == "surprise");
+                        bool neutral = (message == "neutral");
+                        bool foundFace = false;
+
+                        PropertyInfo[] properties = typeof(Behaviors).GetProperties();
+                        foreach (PropertyInfo property in properties)
                         {
-                            case "sad":
-                                allBehaviors[name].Sad++;
+                            if (property.Name == "Match" || property.Name == "CheckMatch")
+                            {
+                                continue;
+                            }
+
+                            if (property.Name.ToLower() == message)
+                            {
+                                int value = (int)property.GetValue(allBehaviors[name]);
+                                property.SetValue(allBehaviors[name], value + 1);
+                                allBehaviors[name].CheckMatch = true;
                                 missesRecognition[name] = 0;
+                                foundFace = true;
                                 break;
-                            case "happy":
-                                allBehaviors[name].Happy++;
-                                goodVibe = true;
-                                missesRecognition[name] = 0;
-                                break;
-                            case "surprise":
-                                allBehaviors[name].Surprise++;
-                                goodVibe = true;
-                                missesRecognition[name] = 0;
-                                break;
-                            case "angry":
-                                allBehaviors[name].Angry++;
-                                missesRecognition[name] = 0;
-                                break;
-                            case "disgust":
-                                allBehaviors[name].Disgust++;
-                                missesRecognition[name] = 0;
-                                break;
-                            case "fear":
-                                allBehaviors[name].Fear++;
-                                missesRecognition[name] = 0;
-                                break;
-                            case "neutral":
-                                allBehaviors[name].Neutral++;
-                                neutral = true;
-                                missesRecognition[name] = 0;
-                                break;
-                            default:
-                                missesRecognition[name]++;
-                                break;
+                            }
+
+                        }
+
+                        if (!foundFace)
+                        {
+                            missesRecognition[name]++;
                         }
 
                         if (missesRecognition[name] >= maxMisses)
@@ -463,21 +456,21 @@ namespace FaceItGUI
                             AddAndCheckMatch(name, neutral, goodVibe, isLoginUser, needToCheck);
                         }
 
-
-                        if (round % 20 == 0 || round == 1)
+                        // changes the feeling on screen according to most feelings he had the last 15 rounds
+                        if (round % 15 == 0 || round == 1)
                         {
-                            PropertyInfo[] properties = typeof(Behaviors).GetProperties();
                             int maxPropertyValue = -1;
-                            PropertyInfo maxProperty = (properties[0].Name != "Match") ? properties[0] : properties[1];
+                            //PropertyInfo maxProperty = (properties[0].Name != "Match") ? properties[0] : properties[1];
+                            PropertyInfo maxProperty = null;
                             foreach (PropertyInfo property in properties)
                             {
-                                if (property.Name == "Match")
+                                if (property.Name == "Match" || property.Name == "CheckMatch")
                                 {
                                     continue;
                                 }
                                 int propertyValue = (int)property.GetValue(allBehaviors[name]);
 
-                                if (propertyValue > maxPropertyValue)
+                                if (maxProperty == null || propertyValue > maxPropertyValue)
                                 {
                                     maxPropertyValue = propertyValue;
                                     maxProperty = property;
@@ -487,6 +480,8 @@ namespace FaceItGUI
                             }
                             Dispatcher.BeginInvoke(new Action(delegate ()
                             {
+                                if (maxProperty == null)
+                                    return;
                                 ((NameInList)namesList.Items[index]).Feeling = maxProperty.Name.ToLower();
                                 NameInList myName = (NameInList)namesList.Items[index];
                                 System.Diagnostics.Debug.WriteLine(myName.Name + ": " + myName.Feeling);
@@ -520,6 +515,7 @@ namespace FaceItGUI
                 }
             }
         }
+
         private System.Drawing.Image ReduceImageSize(double scaleFactor, System.Drawing.Image image)
         {
             var newWidth = (int)(image.Width * scaleFactor);
@@ -560,22 +556,35 @@ namespace FaceItGUI
             }
             if (isLoginUser && needToCheck)
             {
-                int userVibe = allBehaviors[name].Match;
-                allBehaviors[name].Match = 0;
-                int sumMatch = 0;
+                Behaviors userBehaviors = allBehaviors[name];
+                int userVibe = userBehaviors.Match;
+                //int sumMatch = 0;
                 int diff = 5;
+                int numOfPeopleToCheck = 0;
+                int matchedPeople = 0;
                 foreach (var behavior in allBehaviors)
                 {
-                    if (behavior.Key != name)
+                    Behaviors behaviorVal = behavior.Value;
+                    if (behavior.Key != name || behaviorVal.CheckMatch == false)
                     {
-                        sumMatch += behavior.Value.Match;
-                        behavior.Value.Match = 0;
+                        if (Math.Abs(userVibe - behaviorVal.Match) <= diff)
+                        {
+                            matchedPeople++;
+                        }
+                        numOfPeopleToCheck++;
                     }
+                    behavior.Value.Match = 0;
                 }
-                //todo check this
-                int avgMatch = sumMatch / allBehaviors.Count;
+                
+                if (numOfPeopleToCheck == 0)
+                    return;
 
-                if (Math.Abs(userVibe - avgMatch) <= diff)
+                // average
+                //int avgMatch = sumMatch / numOfPeopleToCheck;
+
+                // if (Math.Abs(userVibe - avgMatch) <= diff)
+                // match most of participants
+                if (matchedPeople >= numOfPeopleToCheck / 2)
                 {
                     //good match
                     Dispatcher.BeginInvoke(new Action(delegate ()

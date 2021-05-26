@@ -15,6 +15,7 @@ namespace FaceItGUI
         public int Angry { get; set; }
         public int Disgust { get; set; }
         public int Fear { get; set; }
-        public int Neutral { get; internal set; }
+        public int Neutral { get; set; }
+        public bool CheckMatch { get; set; }
     }
 }

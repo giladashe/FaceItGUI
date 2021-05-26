@@ -15,7 +15,7 @@
         <Grid HorizontalAlignment="Center" >
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="5*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition />
@@ -25,15 +25,16 @@
             </Grid.RowDefinitions>
             <Label FontSize="25" Grid.Row="0" Grid.Column="0" Margin="0,5" Content="Username : " VerticalContentAlignment="Center"
 HorizontalContentAlignment="Left"/>
-            <TextBox Grid.Row="0" Grid.Column="1" x:Name="txtUserName" Margin="0,5" Width="150" VerticalContentAlignment="Center"
+            <TextBox Grid.Row="0" Grid.Column="1" x:Name="txtUserName" Margin="0,5"  VerticalContentAlignment="Center"
 HorizontalContentAlignment="Left" FontSize="20"/>
 
             <Label FontSize="25" Grid.Row="1" Grid.Column="0" Margin="0,5,0,5" Content="Password : " VerticalContentAlignment="Center" HorizontalContentAlignment="Left" HorizontalAlignment="Left"/>
-            <PasswordBox Grid.Row="1" Grid.Column="1" x:Name="txtPassword" Margin="0,5" Width="150" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" FontSize="20"/>
+            <PasswordBox Grid.Row="1" Grid.Column="1" x:Name="txtPassword" Margin="0,5"  VerticalContentAlignment="Center" HorizontalContentAlignment="Left" FontSize="20"/>
 
             <StackPanel Orientation="Horizontal" Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" HorizontalAlignment="Center">
                 <Button Content="Login" FontSize="20" x:Name="btnLogin" Margin="2,10" Width="130" Height="30" Click="LoginClick" Background="#80ff00" Foreground="Black" BorderBrush="White"/>
-                <Button Content="Register"  FontSize="20" x:Name="btnClose" Margin="2,10" Width="130" Click="RegisterClick" Background="#ff2d2d" Foreground="Black" BorderBrush="White"/>
+                <Button Content="Register"  FontSize="20" x:Name="btnClose" Margin="2,10" Width="130" Click="RegisterClick" Background="yellow" Foreground="Black" BorderBrush="White"/>
+                <Button Content="Exit"  FontSize="20" x:Name="btnExit" Margin="2,10" Width="130" Click="ExitClick" Background="#ff2d2d" Foreground="Black" BorderBrush="White"/>
             </StackPanel>
         </Grid>
         <Label x:Name="errorTxt" FontSize="25" Margin="0,5" Content=""

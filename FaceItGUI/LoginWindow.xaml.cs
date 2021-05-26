@@ -42,6 +42,7 @@ namespace FaceItGUI
             //take username and password
             string userName = txtUserName.Text;
             string password = txtPassword.Password;
+            CleanFields();
             this.Content = new MainWindowPage(this, userName);
             return;
             if (userName == string.Empty || password == string.Empty)
@@ -105,6 +106,13 @@ namespace FaceItGUI
             txtPassword.Password = string.Empty;
             errorTxt.Content = string.Empty;
         }
+
+
+        public void ExitClick(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }
+
         /*public void Connect(string ip, int port)
         {
             try
