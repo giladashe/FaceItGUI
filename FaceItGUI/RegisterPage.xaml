@@ -23,13 +23,13 @@
             </Grid.RowDefinitions>
             <Label FontSize="25" Grid.Row="0" Grid.Column="0" Margin="0,5" Content="Username : " VerticalContentAlignment="Center"
 HorizontalContentAlignment="Left"/>
-            <TextBox Grid.Row="0" Grid.Column="1" x:Name="txtUserId" Margin="0,5" Width="150" VerticalContentAlignment="Center"
+            <TextBox Grid.Row="0" Grid.Column="1" x:Name="txtUserName" Margin="0,5" Width="150" VerticalContentAlignment="Center"
 HorizontalContentAlignment="Left"/>
 
             <Label FontSize="25" Grid.Row="1" Grid.Column="0" Margin="0,5,0,5" Content="Password : " VerticalContentAlignment="Center" HorizontalContentAlignment="Left" HorizontalAlignment="Left"/>
             <PasswordBox Grid.Row="1" Grid.Column="1" x:Name="txtPassword" Margin="0,5" Width="150" VerticalContentAlignment="Center" HorizontalContentAlignment="Left"/>
             <Label FontSize="25" Grid.Row="2" Grid.Column="0" Margin="0,5,0,5" Content="Email : " VerticalContentAlignment="Center" HorizontalContentAlignment="Left" HorizontalAlignment="Left"/>
-            <PasswordBox Grid.Row="2" Grid.Column="1" x:Name="txtEmail" Margin="0,5" Width="150" VerticalContentAlignment="Center" HorizontalContentAlignment="Left"/>
+            <TextBox Grid.Row="2" Grid.Column="1" x:Name="txtEmail" Margin="0,5" Width="150" VerticalContentAlignment="Center" HorizontalContentAlignment="Left"/>
 
 
         </Grid>
@@ -37,6 +37,7 @@ HorizontalContentAlignment="Left"/>
             <Button Content="Register"  FontSize="20" x:Name="btnRegister" Margin="2,10" Width="130" Background="#80ff00" Foreground="Black" BorderBrush="White" Click="RegisterUser"/>
             <Button Content="Back To login"  FontSize="20" x:Name="btnBack" Margin="2,10" Width="130"  Background="#ff2d2d" Foreground="Black" BorderBrush="White" Click="Exit"/>
         </StackPanel>
+        <TextBlock Text="" HorizontalAlignment="Center" x:Name="errorTxt" Background="#ff2d2d" FontSize="30"></TextBlock>
 
     </StackPanel>
 </Page>

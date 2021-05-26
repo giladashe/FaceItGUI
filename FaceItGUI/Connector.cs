@@ -22,8 +22,8 @@ namespace FaceItGUI
         public Connector()
         {
             this.Stop = false;
-            this.Ip = ConfigurationManager.AppSettings["Ip"];
-            this.Port = Convert.ToInt32(ConfigurationManager.AppSettings["Port"]);
+            this.Ip = ConfigurationManager.AppSettings["UdpIp"];
+            this.Port = Convert.ToInt32(ConfigurationManager.AppSettings["UdpPort"]);
         }
 
         //public void ProcessImages();

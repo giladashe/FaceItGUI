@@ -44,8 +44,6 @@ namespace FaceItGUI
               this.login.Close();
               window.Show();*/
             this.login.Content = loginContent;
-            this.login.txtUserName.Text = "";
-            this.login.txtPassword.Password = "";
 
         }
     }

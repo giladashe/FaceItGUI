@@ -21,6 +21,9 @@ using System.Drawing.Drawing2D;
 using System.ComponentModel;
 using System.Windows.Controls;
 using System.Reflection;
+using System.Net.Http;
+using System.Net;
+using System.Collections.Concurrent;
 
 namespace FaceItGUI
 {
@@ -31,21 +34,31 @@ namespace FaceItGUI
     {
         private LoginWindow parentWindow;
         private MainWindowPage mainWinPage;
-        private Dictionary<string, Behaviors> allBehaviors;
+        // thread safe dictionary for behaviors to a specific person
+        private ConcurrentDictionary<string, Behaviors> allBehaviors;
+
+        // thread safe dictionary for behaviors to a specific person
+        private ConcurrentDictionary<string, int> missesRecognition;
+
         //private int i = 0;
         private bool stop = false, startCheck = false;
         //private string[] names = { "Gilad", "Israel", "Yossi" };
         private string currentName;
         private readonly string userName;
-        private Dictionary<string, string> namesMap;
+        private ConcurrentDictionary<string, string> namesMap;
+        private static readonly HttpClient client = new HttpClient();
+
 
         /* private UdpClient Client;
          volatile Boolean Stop;
          private NetworkStream Stream;
          private List<NameInList> items;*/
 
-        private int Port;
-        private string Ip;
+        private int UdpPort;
+        private string UdpIp;
+        private int HttpPort;
+        private string HttpIp;
+        private const int maxMisses = 20;
 
         public ConversationPage(LoginWindow loginWindow, MainWindowPage main, string userName)
         {
@@ -55,19 +68,14 @@ namespace FaceItGUI
             // need to take the username from previous screen
             /*this.Client = null;
             this.Stop = false;*/
-            this.Ip = ConfigurationManager.AppSettings["Ip"];
-            this.Port = Convert.ToInt32(ConfigurationManager.AppSettings["Port"]);
-            this.namesMap = new Dictionary<string, string>();
+            this.UdpIp = ConfigurationManager.AppSettings["UdpIp"];
+            this.UdpPort = Convert.ToInt32(ConfigurationManager.AppSettings["UdpPort"]);
+            this.HttpIp = ConfigurationManager.AppSettings["HttpIp"];
+            this.HttpPort = Convert.ToInt32(ConfigurationManager.AppSettings["HttpPort"]);
+            this.namesMap = new ConcurrentDictionary<string, string>();
             this.userName = userName;
-            allBehaviors = new Dictionary<string, Behaviors>();
-            // items = new List<NameInList>();
-            //items.Add(new NameInList() { Name = "Yossi", Feeling = "" });
-            //namesList.ItemsSource = items;
-            /*this.Client = new UdpClient();
-            Client.Connect(Ip, Port);*/
-
-
-            //Connect(Ip,port);
+            allBehaviors = new ConcurrentDictionary<string, Behaviors>();
+            missesRecognition = new ConcurrentDictionary<string, int>();
         }
 
 
@@ -121,34 +129,64 @@ namespace FaceItGUI
 
         public async Task<int> AddToNamesList(string name)
         {
-            namesMap.Add(currentName, currentName);
-            allBehaviors.Add(name, new Behaviors());
-            int index = 0;
-            await Dispatcher.BeginInvoke(new Action(delegate ()
+            try
             {
-                index = namesList.Items.Add(new NameInList() { Name = currentName, Feeling = "" });
-            }));
+                //namesListBorder.get
+                //namesList.ItemContainerStyle.
+                namesMap.TryAdd(name, name);
+                allBehaviors.TryAdd(name, new Behaviors());
+                missesRecognition.TryAdd(name, 0);
+                int index = 0;
+                await Dispatcher.BeginInvoke(new Action(delegate ()
+                {
+                    index = namesList.Items.Add(new NameInList() { Name = name, Feeling = "" });
+                    //var myBorder = new Border();
+                    //listGrid.Children.Add(myBorder)
+                }));
 
-            //int index = await namesList.Items.Add(new NameInList() { Name = currentName, Feeling = "" });
-            return index;
+                //int index = await namesList.Items.Add(new NameInList() { Name = currentName, Feeling = "" });
+                return index;
+            }
+            catch
+            {
+                // name already exists
+                return -1;
+            }
+
         }
 
         private async void MyButton_Click(object sender, RoutedEventArgs e)
         {
             var button = (System.Windows.Controls.Button)sender;
-            currentName = (button.Name == "meButton") ? userName : nameBox.Text;
+            if (button.Name == "meButton")
+            {
+                currentName = userName;
+            }
+            else if (nameBox.Text == string.Empty)
+            {
+                await Dispatcher.BeginInvoke(new Action(delegate ()
+                {
+                    errorTxt.Text = "Write the name first!";
+                }));
+                return;
+            }
+            else
+            {
+                await Dispatcher.BeginInvoke(new Action(delegate ()
+                {
+                    currentName = nameBox.Text;
+                }));
+            }
+
             // items.Add(new NameInList() { Name = currentName, Feeling = "" });
             if (namesMap.ContainsKey(currentName))
             {
                 System.Diagnostics.Debug.WriteLine(currentName + " already exists");
+                //errorTxt.Text = currentName + " already exists";
+                await Dispatcher.BeginInvoke((Action)(() => errorTxt.Text = currentName + " already exists"));
+
                 return;
             }
-            //namesMap.Add(currentName, currentName);
-            //int index = namesList.Items.Add(new NameInList() { Name = currentName, Feeling = "" });
-            int index = await AddToNamesList(currentName);
-
-            int maxUdpDatagramSize = 65515;
-            //string mainDir = MakeScreenShotDirectory();
             this.parentWindow.ShowActivated = false;
             this.parentWindow.Hide();
             Thread.Sleep(300);
@@ -156,8 +194,21 @@ namespace FaceItGUI
             bool isLoginUser = false;
             if (myFrame == null)
             {
+                this.parentWindow.Show();
                 return;
             }
+
+            //namesMap.Add(currentName, currentName);
+            //int index = namesList.Items.Add(new NameInList() { Name = currentName, Feeling = "" });
+            int index = await AddToNamesList(currentName);
+            if (index == -1)
+            {
+                await Dispatcher.BeginInvoke((Action)(() => errorTxt.Text = currentName + " already exists"));
+                return;
+            }
+            int maxUdpDatagramSize = 65515;
+            //string mainDir = MakeScreenShotDirectory();
+
             if (currentName == userName)
             {
                 currentName = "Y" + currentName;
@@ -175,7 +226,7 @@ namespace FaceItGUI
                 checkMatchBtn.Visibility = Visibility.Visible;
             }
 
-            new Thread(delegate ()
+            new Thread(async delegate ()
             {
                 int round = 0;
                 string thisName = currentName;
@@ -191,7 +242,10 @@ namespace FaceItGUI
 
                     try
                     {
-                        
+                        await Dispatcher.BeginInvoke(new Action(delegate ()
+                        {
+                            errorTxt.Text = string.Empty;
+                        }));
                         long localDate = DateTime.Now.Ticks;
                         int numOfEndLines = 2;
                         string localDateStr = localDate.ToString();
@@ -199,9 +253,7 @@ namespace FaceItGUI
                         //int j = 1;
                         while (ImageToByte(image).Length + thisName.Length + localDateStr.Length + numOfEndLines > maxUdpDatagramSize)
                         {
-                            // maybe calculate image only at the end!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                             image = ReduceImageSize(0.9, image);
-                            // System.Diagnostics.Debug.WriteLine("Height: " + image.Height + " Width: " + image.Width);
                         }
                         //System.Diagnostics.Debug.WriteLine("sending " + actualDirectory + fileName);
                         WriteToServer(image, thisName, localDateStr, index, round, isLoginUser);
@@ -227,6 +279,8 @@ namespace FaceItGUI
                     }
                     catch (Exception excep)
                     {
+                        await Dispatcher.BeginInvoke((Action)(() => errorTxt.Text = "Problem with connection to server"));
+
                         System.Diagnostics.Debug.WriteLine("problem: " + excep.Message);
                     }
                 }
@@ -250,17 +304,57 @@ namespace FaceItGUI
         }
 
 
-        public void StopButton_Click(object sender, RoutedEventArgs e)
+        public async void StopButton_Click(object sender, RoutedEventArgs e)
         {
-            this.stop = true;
-            // todo send to Israel!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            if (errorTxt.Text != string.Empty && errorTxt.Text != "Write the name first!")
+            {
+                BackToMainWindow();
+                return;
+            }
+            string httpStopRequest = "http://" + this.HttpIp + ":" + this.HttpPort + "/stop";
+            try
+            {
+                var response = await client.GetAsync(httpStopRequest);
 
-            this.parentWindow.Content = mainWinPage;
+                var responseString = await response.Content.ReadAsStringAsync();
+                switch (response.StatusCode)
+                {
+                    case HttpStatusCode.OK:
+                        BackToMainWindow();
+                        break;
+                    case HttpStatusCode.BadRequest:
+                        await Dispatcher.BeginInvoke(new Action(delegate ()
+                        {
+                            errorTxt.Text = "Server has problem with\n the DB";
+                        }));
+                        break;
+                    default:
+                        await Dispatcher.BeginInvoke(new Action(delegate ()
+                        {
+                            errorTxt.Text = "Connection problem\nwith server";
+                        }));
+                        break;
+                }
+            }
+            catch
+            {
+                await Dispatcher.BeginInvoke(new Action(delegate ()
+                {
+                    errorTxt.Text = "Connection problem\nwith server";
+                }));
+            }
+
 
 
             /*logWin.Show();
             this.Close();*/
 
+        }
+
+        private void BackToMainWindow()
+        {
+            this.stop = true;
+            this.parentWindow.Content = mainWinPage;
         }
 
 
@@ -290,110 +384,140 @@ namespace FaceItGUI
         {
             if (image != null)
             {
-
-                UdpClient udpClient = new UdpClient();
-                udpClient.Connect(Ip, Port);
-                byte[] dataName = Encoding.ASCII.GetBytes(name + "\n" + fileName + "\n");
-                //bytes 0xFF, 0xD9 indicate end of image
-                byte[] dataImage = ImageToByte(image);
-                byte[] bytes = new byte[dataName.Length + dataImage.Length];
-                //byte[] bytes = new byte[80000000000];
-
-                Buffer.BlockCopy(dataName, 0, bytes, 0, dataName.Length);
-                Buffer.BlockCopy(dataImage, 0, bytes, dataName.Length, dataImage.Length);
-                //System.Diagnostics.Debug.WriteLine("data length write: " + bytes.Length);
-                //System.Diagnostics.Debug.WriteLine("size is: " + bytes.Length);
-                //udpClient.Send(dataImage, dataImage.Length);
-
-                udpClient.Send(bytes, bytes.Length);
-                var result = await udpClient.ReceiveAsync();
-                var message = Encoding.ASCII.GetString(result.Buffer, 0, result.Buffer.Length);
-                await Dispatcher.BeginInvoke(new Action(delegate ()
+                try
                 {
-                    // remove 'Y'/'N'
-                    name = name.Substring(1);
-                    bool goodVibe = false;
-                    bool neutral = false;
-                    switch (message)
-                    {
-                        case "sad":
-                            allBehaviors[name].Sad++;
-                            break;
-                        case "happy":
-                            allBehaviors[name].Happy++;
-                            goodVibe = true;
-                            break;
-                        case "surprise":
-                            allBehaviors[name].Surprise++;
-                            goodVibe = true;
-                            break;
-                        case "angry":
-                            allBehaviors[name].Angry++;
-                            break;
-                        case "disgust":
-                            allBehaviors[name].Disgust++;
-                            break;
-                        case "fear":
-                            allBehaviors[name].Fear++;
-                            break;
-                        case "neutral":
-                            allBehaviors[name].Neutral++;
-                            neutral = true;
-                            break;
-                        default:
-                            break;
-                    }
-                    if (startCheck)
-                    {
-                        // check matching to others every 20 seconds (40 * 0.5 seconds)
-                        bool needToCheck = (isLoginUser && round % 30 == 0) ? true : false;
-                        AddAndCheckMatch(name, neutral, goodVibe, isLoginUser, needToCheck);
-                    }
+                    UdpClient udpClient = new UdpClient();
+                    udpClient.Connect(UdpIp, UdpPort);
+                    byte[] dataName = Encoding.ASCII.GetBytes(name + "\n" + fileName + "\n");
+                    //bytes 0xFF, 0xD9 indicate end of image
+                    byte[] dataImage = ImageToByte(image);
+                    byte[] bytes = new byte[dataName.Length + dataImage.Length];
+                    //byte[] bytes = new byte[80000000000];
 
+                    Buffer.BlockCopy(dataName, 0, bytes, 0, dataName.Length);
+                    Buffer.BlockCopy(dataImage, 0, bytes, dataName.Length, dataImage.Length);
+                    //System.Diagnostics.Debug.WriteLine("data length write: " + bytes.Length);
+                    //System.Diagnostics.Debug.WriteLine("size is: " + bytes.Length);
+                    //udpClient.Send(dataImage, dataImage.Length);
 
-                    if (round % 20 == 0)
+                    udpClient.Send(bytes, bytes.Length);
+                    var result = await udpClient.ReceiveAsync();
+                    var message = Encoding.ASCII.GetString(result.Buffer, 0, result.Buffer.Length);
+                    await Dispatcher.BeginInvoke(new Action(delegate ()
                     {
-                        PropertyInfo[] properties = typeof(Behaviors).GetProperties();
-                        int maxPropertyValue = -1;
-                        PropertyInfo maxProperty = (properties[0].Name != "Match") ? properties[0] : properties[1];
-                        foreach (PropertyInfo property in properties)
+                        // remove 'Y'/'N'
+                        name = name.Substring(1);
+                        bool goodVibe = false;
+                        bool neutral = false;
+                        switch (message)
                         {
-                            if (property.Name == "Match")
-                            {
-                                continue;
-                            }
-                            int propertyValue = (int)property.GetValue(allBehaviors[name]);
-                            
-                            if (propertyValue > maxPropertyValue)
-                            {
-                                maxPropertyValue = propertyValue;
-                                maxProperty = property;
-                                property.SetValue(allBehaviors[name], 0);
-                            }
-
+                            case "sad":
+                                allBehaviors[name].Sad++;
+                                missesRecognition[name] = 0;
+                                break;
+                            case "happy":
+                                allBehaviors[name].Happy++;
+                                goodVibe = true;
+                                missesRecognition[name] = 0;
+                                break;
+                            case "surprise":
+                                allBehaviors[name].Surprise++;
+                                goodVibe = true;
+                                missesRecognition[name] = 0;
+                                break;
+                            case "angry":
+                                allBehaviors[name].Angry++;
+                                missesRecognition[name] = 0;
+                                break;
+                            case "disgust":
+                                allBehaviors[name].Disgust++;
+                                missesRecognition[name] = 0;
+                                break;
+                            case "fear":
+                                allBehaviors[name].Fear++;
+                                missesRecognition[name] = 0;
+                                break;
+                            case "neutral":
+                                allBehaviors[name].Neutral++;
+                                neutral = true;
+                                missesRecognition[name] = 0;
+                                break;
+                            default:
+                                missesRecognition[name]++;
+                                break;
                         }
 
-                        ((NameInList)namesList.Items[index]).Feeling = maxProperty.Name.ToLower();
-                        NameInList myName = (NameInList)namesList.Items[index];
-                        System.Diagnostics.Debug.WriteLine(myName.Name + ": " + myName.Feeling);
-                        //namesList.Items[index] = myName;
+                        if (missesRecognition[name] >= maxMisses)
+                        {
+                            Dispatcher.BeginInvoke(new Action(delegate ()
+                            {
+                                errorTxt.Text = "Couldn't recognize\n" + name + "'s " + "face";
+                            }));
+                            return;
+                        }
 
-                    }
-                }));
-
-                //(NameInList)(namesList.Items.GetItemAt(index)).Feeling = message;
-                //namesList.();
-                //NameInList myName = (NameInList)namesList.Items[index];
-                //myName.Feeling = message;
-
+                        if (startCheck)
+                        {
+                            // check matching to others every 20 seconds (40 * 0.5 seconds)
+                            bool needToCheck = (isLoginUser && round % 30 == 0);
+                            AddAndCheckMatch(name, neutral, goodVibe, isLoginUser, needToCheck);
+                        }
 
 
-                //listBox1.Items.Add(thisFile.ToString());
-                System.Diagnostics.Debug.WriteLine(message);
+                        if (round % 20 == 0 || round == 1)
+                        {
+                            PropertyInfo[] properties = typeof(Behaviors).GetProperties();
+                            int maxPropertyValue = -1;
+                            PropertyInfo maxProperty = (properties[0].Name != "Match") ? properties[0] : properties[1];
+                            foreach (PropertyInfo property in properties)
+                            {
+                                if (property.Name == "Match")
+                                {
+                                    continue;
+                                }
+                                int propertyValue = (int)property.GetValue(allBehaviors[name]);
 
-                // udpClient.Close();
-                // this.Stream.Write(bytes, 0, bytes.Length);
+                                if (propertyValue > maxPropertyValue)
+                                {
+                                    maxPropertyValue = propertyValue;
+                                    maxProperty = property;
+                                    property.SetValue(allBehaviors[name], 0);
+                                }
 
+                            }
+                            Dispatcher.BeginInvoke(new Action(delegate ()
+                            {
+                                ((NameInList)namesList.Items[index]).Feeling = maxProperty.Name.ToLower();
+                                NameInList myName = (NameInList)namesList.Items[index];
+                                System.Diagnostics.Debug.WriteLine(myName.Name + ": " + myName.Feeling);
+                                //namesList.Items[index] = myName;
+                            }));
+
+                        }
+                    }));
+
+                    //(NameInList)(namesList.Items.GetItemAt(index)).Feeling = message;
+                    //namesList.();
+                    //NameInList myName = (NameInList)namesList.Items[index];
+                    //myName.Feeling = message;
+
+
+
+                    //listBox1.Items.Add(thisFile.ToString());
+                    System.Diagnostics.Debug.WriteLine(message);
+
+                    // udpClient.Close();
+                    // this.Stream.Write(bytes, 0, bytes.Length);
+                }
+                catch (Exception e)
+                {
+                    await Dispatcher.BeginInvoke(new Action(delegate ()
+                    {
+                        errorTxt.Text = "Connection problem\nwith server";
+                        System.Diagnostics.Debug.WriteLine(e.Message);
+
+                    }));
+                }
             }
         }
         private System.Drawing.Image ReduceImageSize(double scaleFactor, System.Drawing.Image image)
@@ -448,17 +572,24 @@ namespace FaceItGUI
                         behavior.Value.Match = 0;
                     }
                 }
+                //todo check this
                 int avgMatch = sumMatch / allBehaviors.Count;
 
                 if (Math.Abs(userVibe - avgMatch) <= diff)
                 {
                     //good match
-                    matchText.Text = "You match your\n interlocutors :)";
+                    Dispatcher.BeginInvoke(new Action(delegate ()
+                    {
+                        matchText.Text = "You match your\n interlocutors :)";
+                    }));
                 }
                 else
                 {
-                    //bad match
-                    matchText.Text = "You need to adjust your\n behaviors to the\n conversation!";
+                    Dispatcher.BeginInvoke(new Action(delegate ()
+                    {
+                        //bad match
+                        matchText.Text = "You need to adjust your\n behaviors to the\n conversation!";
+                    }));
                 }
             }
         }

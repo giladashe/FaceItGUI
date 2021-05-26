@@ -10,26 +10,27 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="3*"/>
             <ColumnDefinition Width="5*"/>
+            <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="2*"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Border Background="#2f5cb6">
+        <Border Grid.Column ="1" Background="#2f5cb6">
             <StackPanel>
-                <Button x:Name="checkMatchBtn" Click="CheckMatchOnClick" 
-                Content="Check matching" Visibility="Hidden"/>
+                <Button x:Name="checkMatchBtn" Click="CheckMatchOnClick" Content="Finished snipping? Check matching!" Visibility="Hidden" FontSize="18" Background="Khaki"/>
                 <TextBlock x:Name="matchText" HorizontalAlignment="Center" Foreground="White" FontSize="25" Text=""/>
+                <TextBlock Width="300" Margin="0,100,0,0"  x:Name="errorTxt" HorizontalAlignment="Center" TextAlignment="Center" Foreground="red" FontSize="30" />
             </StackPanel>
         </Border>
-        <Border Grid.Column ="1" Background="#1f3d7a"/>
-        <Border Grid.Row="1" Grid.ColumnSpan="2" Background="#152951" >
-            <ListBox x:Name="namesList" >
+        <Border Grid.Column ="0" Background="#1f3d7a"/>
+        <Border x:Name="namesListBorder" Grid.Row="1" Grid.ColumnSpan="2" Background="#152951" >
+            <ListBox x:Name="namesList" Background="#152951" >
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Grid Margin="0,2">
+                        <Grid x:Name="listGrid" Background="#2f5cb6" Margin="0,2" >
+
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="2*" />
@@ -41,20 +42,19 @@
                 </ListBox.ItemTemplate>
             </ListBox>
         </Border>
-        <StackPanel Grid.Column="1" Margin="40,0,0,0" VerticalAlignment="Center">
-            <TextBlock HorizontalAlignment="Center" Foreground="White" FontSize="25" Text="Welcome To FaceIt!"/>
-            <TextBlock x:Name="snipMeTxt" HorizontalAlignment="Center" Foreground="White" FontSize="25" Text="Please snip yourself!"/>
-            <Button x:Name="meButton" Click="MyButton_Click" Width="168">
+        <StackPanel Grid.Column="0" Margin="40,20,0,0" VerticalAlignment="Center">
+            <TextBlock HorizontalAlignment="Center" Foreground="White" FontSize="30" Text="Welcome To FaceIt"/>
+            <TextBlock x:Name="snipMeTxt" Margin="10" HorizontalAlignment="Center" Foreground="White" FontSize="23" Text="Please snip yourself!"/>
+            <Button x:Name="meButton" Click="MyButton_Click" Width="230" FontSize="20" Background="GreenYellow">
                 snip my video
             </Button>
             <TextBlock x:Name="othersTxt" HorizontalAlignment="Center" Foreground="White" FontSize="25" Text="Want to snip others?" Visibility="Hidden"/>
             <TextBox  x:Name="nameBox" Visibility="Hidden"/>
 
-            <Button x:Name="othersButton" Click="MyButton_Click" Width="168" Visibility="Hidden">
+            <Button x:Name="othersButton" Click="MyButton_Click" Width="230" FontSize="20" Background="GreenYellow" Visibility="Hidden">
                 press after writing name
             </Button>
-            <Button x:Name="stopButton" Click="StopButton_Click" Width="168" 
-                    Margin="50" HorizontalAlignment="Left">
+            <Button x:Name="stopButton" Click="StopButton_Click" Width="230" Margin="0,30,0,0" HorizontalAlignment="center" FontSize="20" Background="OrangeRed">
                 Stop conversation
             </Button>
         </StackPanel>

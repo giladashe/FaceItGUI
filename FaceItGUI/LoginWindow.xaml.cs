@@ -11,6 +11,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Net.Http;
+using System.Net;
 
 namespace FaceItGUI
 {
@@ -24,25 +26,61 @@ namespace FaceItGUI
 
         private NetworkStream Stream;
         private TcpClient Client;
-
+        private static readonly HttpClient client = new HttpClient();
 
 
         public LoginWindow()
         {
             InitializeComponent();
-            this.Ip = ConfigurationManager.AppSettings["Ip"];
-            this.Port = Convert.ToInt32(ConfigurationManager.AppSettings["Port"]);
+            this.Ip = ConfigurationManager.AppSettings["HttpIp"];
+            this.Port = Convert.ToInt32(ConfigurationManager.AppSettings["HttpPort"]);
         }
 
 
-        public void btnLogin_Click_1(object sender, RoutedEventArgs e)
+        public async void LoginClick(object sender, RoutedEventArgs e)
         {
-
-           //take username and password
+            //take username and password
             string userName = txtUserName.Text;
             string password = txtPassword.Password;
-            // todo: check userName and password and send to israel
             this.Content = new MainWindowPage(this, userName);
+            return;
+            if (userName == string.Empty || password == string.Empty)
+            {
+                errorTxt.Content = "All fields are mandatory!";
+                return;
+            }
+            string httpLoginRequest = "http://" + this.Ip + ":" + this.Port + "/login?username=" + userName + "&password=" + password;
+            try
+            {
+                var response = await client.GetAsync(httpLoginRequest);
+
+                var responseString = await response.Content.ReadAsStringAsync();
+                switch (response.StatusCode)
+                {
+                    case HttpStatusCode.OK:
+                        if (responseString == "success")
+                        {
+                            CleanFields();
+                            this.Content = new MainWindowPage(this, userName);
+                        }
+                        else
+                        {
+                            errorTxt.Content = "Wrong username/password!";
+                        }
+                        break;
+                    case HttpStatusCode.BadRequest:
+                        errorTxt.Content = "DB connection problem";
+                        break;
+                    default:
+                        errorTxt.Content = "Problem with connection to server";
+                        break;
+                }
+            }
+            catch
+            {
+                errorTxt.Content = "Problem with connection to server";
+            }
+
 
             /*MainWindow mainWin = new MainWindow(userName);
             mainWin.Show();
@@ -51,11 +89,21 @@ namespace FaceItGUI
         }
 
 
-        public void btnRegister_Click(object sender, RoutedEventArgs e)
+        public void RegisterClick(object sender, RoutedEventArgs e)
         {
+            CleanFields();
             this.Content = new RegisterPage(this);
-           /* RegisterWindow registerWin = new RegisterWindow();
-            registerWin.Show();*/
+
+
+            /* RegisterWindow registerWin = new RegisterWindow();
+             registerWin.Show();*/
+        }
+
+        private void CleanFields()
+        {
+            txtUserName.Text = string.Empty;
+            txtPassword.Password = string.Empty;
+            errorTxt.Content = string.Empty;
         }
         /*public void Connect(string ip, int port)
         {
