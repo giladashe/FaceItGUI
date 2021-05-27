@@ -42,9 +42,6 @@ namespace FaceItGUI
             //take username and password
             string userName = txtUserName.Text;
             string password = txtPassword.Password;
-            CleanFields();
-            this.Content = new MainWindowPage(this, userName);
-            return;
             if (userName == string.Empty || password == string.Empty)
             {
                 errorTxt.Content = "All fields are mandatory!";
