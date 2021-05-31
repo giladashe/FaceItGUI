@@ -14,7 +14,6 @@ using System.Net.Http;
 using System.Configuration;
 using System.Net;
 using System.Security.Cryptography;
-using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 
 namespace FaceItGUI
 {

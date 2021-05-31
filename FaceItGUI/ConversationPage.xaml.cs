@@ -24,6 +24,7 @@ using System.Reflection;
 using System.Net.Http;
 using System.Net;
 using System.Collections.Concurrent;
+using System.Timers;
 
 namespace FaceItGUI
 {
@@ -40,19 +41,13 @@ namespace FaceItGUI
         // thread safe dictionary for behaviors to a specific person
         private ConcurrentDictionary<string, int> missesRecognition;
 
-        //private int i = 0;
         private bool stop = false, startCheck = false;
-        //private string[] names = { "Gilad", "Israel", "Yossi" };
         private string currentName;
         private readonly string userName;
         private ConcurrentDictionary<string, string> namesMap;
         private static readonly HttpClient client = new HttpClient();
-
-
-        /* private UdpClient Client;
-         volatile Boolean Stop;
-         private NetworkStream Stream;
-         private List<NameInList> items;*/
+        private bool startedConversation = false;
+        private DateTime lastTime;
 
         private int UdpPort;
         private string UdpIp;
@@ -65,74 +60,21 @@ namespace FaceItGUI
             InitializeComponent();
             this.parentWindow = loginWindow;
             this.mainWinPage = main;
-            // need to take the username from previous screen
-            /*this.Client = null;
-            this.Stop = false;*/
             this.UdpIp = ConfigurationManager.AppSettings["UdpIp"];
             this.UdpPort = Convert.ToInt32(ConfigurationManager.AppSettings["UdpPort"]);
             this.HttpIp = ConfigurationManager.AppSettings["HttpIp"];
             this.HttpPort = Convert.ToInt32(ConfigurationManager.AppSettings["HttpPort"]);
             this.namesMap = new ConcurrentDictionary<string, string>();
             this.userName = userName;
+            this.lastTime = DateTime.Now;
             allBehaviors = new ConcurrentDictionary<string, Behaviors>();
             missesRecognition = new ConcurrentDictionary<string, int>();
         }
-
-
-        /*    public void Connect(string ip, int port)
-            {
-                try
-                {
-                    Stop = false;
-                    this.Client = new UdpClient();
-                    Client.Connect(ip, port);
-                   // this.Stream = this.Client.GetStream();
-                }
-                catch
-                {
-
-                }
-            }*/
-        /*   public static UdpUser ConnectTo(string hostname, int port)
-           {
-               var connection = new UdpUser();
-               connection.Client.Connect(hostname, port);
-               return connection;
-           }*/
-
-        /*  public void Send(string message)
-          {
-              UdpClient udpClient = new UdpClient();
-              udpClient.Connect(Ip, Port);
-              Byte[] senddata = Encoding.ASCII.GetBytes("Hello World");
-              Client.Send(senddata, senddata.Length);
-              var datagram = Encoding.ASCII.GetBytes(message);
-              Client.Send(datagram, datagram.Length);
-              udpClient.Close();
-          }
-  */
-        /*  public void Disconnect()
-          {
-              Stop = true;
-              if (this.Stream != null)
-              {
-                  this.Stream.Close();
-                  this.Stream = null;
-              }
-              if (this.Client != null)
-              {
-                  this.Client.Dispose();
-                  this.Client.Close();
-              }
-          }*/
-
 
         public async Task<int> AddToNamesList(string name)
         {
             try
             {
-                //namesListBorder.get
-                //namesList.ItemContainerStyle.
                 namesMap.TryAdd(name, name);
                 Behaviors behaviors = new Behaviors
                 {
@@ -144,11 +86,8 @@ namespace FaceItGUI
                 await Dispatcher.BeginInvoke(new Action(delegate ()
                 {
                     index = namesList.Items.Add(new NameInList() { Name = name, Feeling = "" });
-                    //var myBorder = new Border();
-                    //listGrid.Children.Add(myBorder)
                 }));
 
-                //int index = await namesList.Items.Add(new NameInList() { Name = currentName, Feeling = "" });
                 return index;
             }
             catch
@@ -170,7 +109,11 @@ namespace FaceItGUI
             {
                 await Dispatcher.BeginInvoke(new Action(delegate ()
                 {
-                    errorTxt.Text = "Write the name first!";
+                    string message = "Write the name first!";
+                    if (Math.Abs((DateTime.Now - this.lastTime).TotalSeconds) > 5 && errorTxt.Text != message)
+                    {
+                        errorTxt.Text = message;
+                    }
                 }));
                 return;
             }
@@ -181,14 +124,17 @@ namespace FaceItGUI
                     currentName = nameBox.Text;
                 }));
             }
-            nameBox.Text = string.Empty;
-            // items.Add(new NameInList() { Name = currentName, Feeling = "" });
             if (namesMap.ContainsKey(currentName))
             {
                 System.Diagnostics.Debug.WriteLine(currentName + " already exists");
-                //errorTxt.Text = currentName + " already exists";
-                await Dispatcher.BeginInvoke((Action)(() => errorTxt.Text = currentName + " already exists"));
-
+                await Dispatcher.BeginInvoke(new Action(delegate ()
+                {
+                    string message = $"{currentName} already exists";
+                    if (Math.Abs((DateTime.Now - this.lastTime).TotalSeconds) > 5 && errorTxt.Text != message)
+                    {
+                        errorTxt.Text = message;
+                    }
+                }));
                 return;
             }
             this.parentWindow.ShowActivated = false;
@@ -201,17 +147,26 @@ namespace FaceItGUI
                 this.parentWindow.Show();
                 return;
             }
-
-            //namesMap.Add(currentName, currentName);
-            //int index = namesList.Items.Add(new NameInList() { Name = currentName, Feeling = "" });
+            if (!startedConversation)
+            {
+                System.Timers.Timer myTimer = SetTimer();
+                myTimer.Start();
+            }
+            startedConversation = true;
             int index = await AddToNamesList(currentName);
             if (index == -1)
             {
-                await Dispatcher.BeginInvoke((Action)(() => errorTxt.Text = currentName + " already exists"));
+                await Dispatcher.BeginInvoke(new Action(delegate ()
+                {
+                    string message = $"{currentName} already exists";
+                    if (Math.Abs((DateTime.Now - this.lastTime).TotalSeconds) > 5 && errorTxt.Text != message)
+                    {
+                        errorTxt.Text = message;
+                    }
+                }));
                 return;
             }
             int maxUdpDatagramSize = 65515;
-            //string mainDir = MakeScreenShotDirectory();
 
             if (currentName == userName)
             {
@@ -234,57 +189,35 @@ namespace FaceItGUI
             {
                 int round = 0;
                 string thisName = currentName;
-                // a little depends that row 52 will be executed before other snippinig tool capture
-                //string id = names[i];
-                //i++;
-                //var currentSnip = myFrame.Clone();
-                //string currentDir = MakeSpecificDirectory(mainDir, currentName);
                 while (!stop)
                 {
-                    // take picture every 0.5 second !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                    // takes picture every 0.5 second 
                     Thread.Sleep(500);
-
                     try
                     {
-                        await Dispatcher.BeginInvoke(new Action(delegate ()
-                        {
-                            errorTxt.Text = string.Empty;
-                        }));
                         long localDate = DateTime.Now.Ticks;
                         int numOfEndLines = 2;
                         string localDateStr = localDate.ToString();
                         System.Drawing.Image image = SnippingTool.FromRectangle(myFrame.Frame);
-                        //int j = 1;
                         while (ImageToByte(image).Length + thisName.Length + localDateStr.Length + numOfEndLines > maxUdpDatagramSize)
                         {
                             image = ReduceImageSize(0.9, image);
                         }
-                        //System.Diagnostics.Debug.WriteLine("sending " + actualDirectory + fileName);
                         WriteToServer(image, thisName, localDateStr, index, round, isLoginUser);
 
                         round++;
-                        // byte[] data = ReadFromServer();
-
-                        /*MemoryStream ms = new MemoryStream(data);
-                        System.Drawing.Image img = System.Drawing.Image.FromStream(ms);*/
-                        //System.Diagnostics.Debug.WriteLine("got the image: " + actualDirectory + fileName);
-                        //                      System.Diagnostics.Debug.WriteLine("width: " + image.Width + " Height: " +image.Height);
-
-                        // image.Save(actualDirectory + fileName, System.Drawing.Imaging.ImageFormat.Jpeg);
-                        //System.Diagnostics.Debug.WriteLine(fileName + " sent");
-
-                        /* if (bmp != null)
-                         {
-                             bmp.Save("myImage" + i + ".png");
-                             // Do something with the bitmap
-                             //...
-                             i++;
-                         }*/
                     }
                     catch (Exception excep)
                     {
-                        await Dispatcher.BeginInvoke((Action)(() => errorTxt.Text = "Problem with connection to server"));
+                        await Dispatcher.BeginInvoke(new Action(delegate ()
+                        {
+                            string message = "Connection problem\nwith server";
+                            if (Math.Abs((DateTime.Now - this.lastTime).TotalSeconds) > 5 && errorTxt.Text != message)
+                            {
+                                errorTxt.Text = message;
+                            }
 
+                        }));
                         System.Diagnostics.Debug.WriteLine("problem: " + excep.Message);
                     }
                 }
@@ -293,24 +226,33 @@ namespace FaceItGUI
             }).Start();
             this.parentWindow.WindowState = WindowState.Minimized;
             this.parentWindow.Show();
-            // string folderPath = Server.MapPath("~/ImagesFolder/");  //Create a Folder in your Root directory on your solution.
-            // string fileName = "~/screenshots/IMageName.jpg";
-            /*string imagePath = folderPath + fileName;
-
-            string base64StringData = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlgAAADmCAYAAAA..........."; // Your base 64 string data
-            string cleandata = base64StringData.Replace("data:image/png;base64,", "");
-            byte[] data = System.Convert.FromBase64String(cleandata);
-            MemoryStream ms = new MemoryStream(data);
-            System.Drawing.Image img = System.Drawing.Image.FromStream(ms);*/
-
-
 
         }
 
 
+        private System.Timers.Timer SetTimer()
+        {
+            // Create a timer with a two second interval.
+            System.Timers.Timer aTimer = new System.Timers.Timer(7000);
+            // Hook up the Elapsed event for the timer. 
+            aTimer.Elapsed += OnTimedEvent;
+            aTimer.AutoReset = true;
+            aTimer.Enabled = true;
+            return aTimer;
+        }
+
+        private void OnTimedEvent(Object source, ElapsedEventArgs e)
+        {
+            Dispatcher.BeginInvoke(new Action(delegate ()
+            {
+                this.lastTime = DateTime.Now;
+                errorTxt.Text = string.Empty;
+            }));
+        }
+
         public async void StopButton_Click(object sender, RoutedEventArgs e)
         {
-            if (errorTxt.Text != string.Empty && errorTxt.Text != "Write the name first!")
+            if (!startedConversation)
             {
                 BackToMainWindow();
                 return;
@@ -329,13 +271,22 @@ namespace FaceItGUI
                     case HttpStatusCode.BadRequest:
                         await Dispatcher.BeginInvoke(new Action(delegate ()
                         {
-                            errorTxt.Text = "Server has problem with\n the DB";
+                            string message = "Server has problem with\n the DB";
+                            if (Math.Abs((DateTime.Now - this.lastTime).TotalSeconds) > 5 && errorTxt.Text != message)
+                            {
+                                errorTxt.Text = message;
+                            }
                         }));
                         break;
                     default:
                         await Dispatcher.BeginInvoke(new Action(delegate ()
                         {
-                            errorTxt.Text = "Connection problem\nwith server";
+                            string message = "Connection problem\nwith server";
+                            if (Math.Abs((DateTime.Now - this.lastTime).TotalSeconds) > 5 && errorTxt.Text != message)
+                            {
+                                errorTxt.Text = message;
+                            }
+                           
                         }));
                         break;
                 }
@@ -344,14 +295,15 @@ namespace FaceItGUI
             {
                 await Dispatcher.BeginInvoke(new Action(delegate ()
                 {
-                    errorTxt.Text = "Connection problem\nwith server";
+                    string message = "Connection problem\nwith server";
+                    if (Math.Abs((DateTime.Now - this.lastTime).TotalSeconds) > 5 && errorTxt.Text != message)
+                    {
+                        errorTxt.Text = message;
+                    }
+
                 }));
             }
 
-
-
-            /*logWin.Show();
-            this.Close();*/
 
         }
 
@@ -361,27 +313,6 @@ namespace FaceItGUI
             this.parentWindow.Content = mainWinPage;
         }
 
-
-        private string MakeScreenShotDirectory()
-        {
-            string path = Directory.GetCurrentDirectory();
-            string screenshotsDirectory = path + "\\Screenshots";
-            if (!Directory.Exists(path))
-            {
-                Directory.CreateDirectory(screenshotsDirectory);
-            }
-            return screenshotsDirectory;
-        }
-
-        private string MakeSpecificDirectory(string mainDir, string name)
-        {
-            var actualDirectory = mainDir + "\\" + name;
-            if (!Directory.Exists(actualDirectory))
-            {
-                Directory.CreateDirectory(actualDirectory);
-            }
-            return actualDirectory;
-        }
 
 
         public async void WriteToServer(System.Drawing.Image image, string name, string fileName, int index, int round, bool isLoginUser)
@@ -396,13 +327,9 @@ namespace FaceItGUI
                     //bytes 0xFF, 0xD9 indicate end of image
                     byte[] dataImage = ImageToByte(image);
                     byte[] bytes = new byte[dataName.Length + dataImage.Length];
-                    //byte[] bytes = new byte[80000000000];
 
                     Buffer.BlockCopy(dataName, 0, bytes, 0, dataName.Length);
                     Buffer.BlockCopy(dataImage, 0, bytes, dataName.Length, dataImage.Length);
-                    //System.Diagnostics.Debug.WriteLine("data length write: " + bytes.Length);
-                    //System.Diagnostics.Debug.WriteLine("size is: " + bytes.Length);
-                    //udpClient.Send(dataImage, dataImage.Length);
 
                     udpClient.Send(bytes, bytes.Length);
                     var result = await udpClient.ReceiveAsync();
@@ -444,7 +371,11 @@ namespace FaceItGUI
                         {
                             Dispatcher.BeginInvoke(new Action(delegate ()
                             {
-                                errorTxt.Text = "Couldn't recognize\n" + name + "'s " + "face";
+                                string message = $"Couldn't recognize\n {name}'s face";
+                                if (Math.Abs((DateTime.Now - this.lastTime).TotalSeconds) > 5 && errorTxt.Text != message)
+                                {
+                                    errorTxt.Text = message;
+                                }
                             }));
                             return;
                         }
@@ -485,30 +416,21 @@ namespace FaceItGUI
                                 ((NameInList)namesList.Items[index]).Feeling = maxProperty.Name.ToLower();
                                 NameInList myName = (NameInList)namesList.Items[index];
                                 System.Diagnostics.Debug.WriteLine(myName.Name + ": " + myName.Feeling);
-                                //namesList.Items[index] = myName;
                             }));
 
                         }
                     }));
-
-                    //(NameInList)(namesList.Items.GetItemAt(index)).Feeling = message;
-                    //namesList.();
-                    //NameInList myName = (NameInList)namesList.Items[index];
-                    //myName.Feeling = message;
-
-
-
-                    //listBox1.Items.Add(thisFile.ToString());
                     System.Diagnostics.Debug.WriteLine(message);
-
-                    // udpClient.Close();
-                    // this.Stream.Write(bytes, 0, bytes.Length);
                 }
                 catch (Exception e)
                 {
                     await Dispatcher.BeginInvoke(new Action(delegate ()
                     {
-                        errorTxt.Text = "Connection problem\nwith server";
+                        string message = "Connection problem\nwith server";
+                        if (Math.Abs((DateTime.Now - this.lastTime).TotalSeconds) > 5 && errorTxt.Text != message)
+                        {
+                            errorTxt.Text = message;
+                        }
                         System.Diagnostics.Debug.WriteLine(e.Message);
 
                     }));
@@ -558,7 +480,6 @@ namespace FaceItGUI
             {
                 Behaviors userBehaviors = allBehaviors[name];
                 int userVibe = userBehaviors.Match;
-                //int sumMatch = 0;
                 int diff = 5;
                 double numOfPeopleToCheck = 0.0;
                 double matchedPeople = 0.0;
@@ -602,50 +523,6 @@ namespace FaceItGUI
                 }
             }
         }
-
-        /* public byte[] ReadFromServer()
-         {
-             bool end = false;
-             if (this.Stream == null)
-             {
-                 //this.Error = "First Server!!";
-                 return null;
-             }
-             byte[] data = new byte[1000000];
-             string wow = "";
-
-             //StringBuilder response = new StringBuilder();
-             int i = 0;
-             while (!end)
-             {
-                 Stream.Read(data, 0, data.Length);
-                 for (; i < data.Length; i++)
-                 {
-                     //System.Diagnostics.Debug.WriteLine("Before if: " + i);
-                     //System.Diagnostics.Debug.WriteLine((char)data[i]);
-                     if ((char)data[i] == '\n')
-                     {
-                         //System.Diagnostics.Debug.WriteLine("in if: " + i);
-
-                         end = true;
-                         break;
-                     }
-                 }
-
-                 //System.Diagnostics.Debug.WriteLine("after all: " + i);
-
-                 wow = Encoding.ASCII.GetString(data, 0, i);
-                 //System.Diagnostics.Debug.WriteLine(wow);
-
-                 // wow
-                 // end = true;
-             }
-             // return response.ToString();
-             //System.Diagnostics.Debug.WriteLine("data length read: " + data.Length);
-
-             return data;
-
-         }*/
 
         public static byte[] ImageToByte(System.Drawing.Image iImage)
         {
