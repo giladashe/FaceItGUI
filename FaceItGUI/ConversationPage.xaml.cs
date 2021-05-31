@@ -451,13 +451,13 @@ namespace FaceItGUI
 
                         if (startCheck)
                         {
-                            // check matching to others every 20 seconds (40 * 0.5 seconds)
-                            bool needToCheck = (isLoginUser && round % 30 == 0);
+                            // check matching to others every 15 rounds
+                            bool needToCheck = (isLoginUser && round % 15 == 0);
                             AddAndCheckMatch(name, neutral, goodVibe, isLoginUser, needToCheck);
                         }
 
                         // changes the feeling on screen according to most feelings he had the last 15 rounds
-                        if (round % 15 == 0 || round == 1)
+                        if (round % 10 == 0 || round == 1)
                         {
                             int maxPropertyValue = -1;
                             //PropertyInfo maxProperty = (properties[0].Name != "Match") ? properties[0] : properties[1];
@@ -560,8 +560,8 @@ namespace FaceItGUI
                 int userVibe = userBehaviors.Match;
                 //int sumMatch = 0;
                 int diff = 5;
-                int numOfPeopleToCheck = 0;
-                int matchedPeople = 0;
+                double numOfPeopleToCheck = 0.0;
+                double matchedPeople = 0.0;
                 foreach (var behavior in allBehaviors)
                 {
                     Behaviors behaviorVal = behavior.Value;
@@ -576,7 +576,7 @@ namespace FaceItGUI
                     behavior.Value.Match = 0;
                 }
                 
-                if (numOfPeopleToCheck == 0)
+                if (numOfPeopleToCheck == 0.0)
                     return;
 
                 // average
@@ -584,7 +584,7 @@ namespace FaceItGUI
 
                 // if (Math.Abs(userVibe - avgMatch) <= diff)
                 // match most of participants
-                if (matchedPeople >= numOfPeopleToCheck / 2)
+                if (matchedPeople >= numOfPeopleToCheck / 2.0)
                 {
                     //good match
                     Dispatcher.BeginInvoke(new Action(delegate ()
