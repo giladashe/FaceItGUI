@@ -48,6 +48,7 @@ namespace FaceItGUI
         private static readonly HttpClient client = new HttpClient();
         private bool startedConversation = false;
         private DateTime lastTime;
+        private System.Timers.Timer blankSpaceTimer;
 
         private int UdpPort;
         private string UdpIp;
@@ -67,6 +68,7 @@ namespace FaceItGUI
             this.namesMap = new ConcurrentDictionary<string, string>();
             this.userName = userName;
             this.lastTime = DateTime.Now;
+            this.blankSpaceTimer = null;
             allBehaviors = new ConcurrentDictionary<string, Behaviors>();
             missesRecognition = new ConcurrentDictionary<string, int>();
         }
@@ -149,8 +151,8 @@ namespace FaceItGUI
             }
             if (!startedConversation)
             {
-                System.Timers.Timer myTimer = SetTimer();
-                myTimer.Start();
+                this.blankSpaceTimer = SetTimer();
+                this.blankSpaceTimer.Start();
             }
             startedConversation = true;
             int index = await AddToNamesList(currentName);
@@ -266,6 +268,7 @@ namespace FaceItGUI
                 switch (response.StatusCode)
                 {
                     case HttpStatusCode.OK:
+                        this.blankSpaceTimer.Stop();
                         BackToMainWindow();
                         break;
                     case HttpStatusCode.BadRequest:
