@@ -24,8 +24,6 @@ namespace FaceItGUI
         private int Port;
         private string Ip;
 
-        private NetworkStream Stream;
-        private TcpClient Client;
         private static readonly HttpClient client = new HttpClient();
 
 
@@ -87,11 +85,6 @@ namespace FaceItGUI
                 errorTxt.Content = "Problem with connection to server";
             }
 
-
-            /*MainWindow mainWin = new MainWindow(userName);
-            mainWin.Show();
-            this.Close();*/
-            //Stream.Write()
         }
 
 
@@ -100,9 +93,6 @@ namespace FaceItGUI
             CleanFields();
             this.Content = new RegisterPage(this);
 
-
-            /* RegisterWindow registerWin = new RegisterWindow();
-             registerWin.Show();*/
         }
 
         private void CleanFields()
@@ -112,38 +102,10 @@ namespace FaceItGUI
             errorTxt.Content = string.Empty;
         }
 
-
         public void ExitClick(object sender, RoutedEventArgs e)
         {
             this.Close();
         }
-
-        /*public void Connect(string ip, int port)
-        {
-            try
-            {
-                this.Client = new TcpClient();
-                Client.Connect(ip, port);
-                this.Stream = this.Client.GetStream();
-            }
-            catch
-            {
-
-            }
-        }
-
-        public void Disconnect()
-        {
-            if (this.Stream != null)
-            {
-                this.Stream.Close();
-                this.Stream = null;
-            }
-            if (this.Client != null)
-            {
-                this.Client.Dispose();
-                this.Client.Close();
-            }
-        }*/
+  
     }
 }

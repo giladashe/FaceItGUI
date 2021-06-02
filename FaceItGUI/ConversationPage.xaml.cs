@@ -49,12 +49,17 @@ namespace FaceItGUI
         private bool startedConversation = false;
         private DateTime lastTime;
         private System.Timers.Timer blankSpaceTimer;
+        private int allChecks = 0;
+        private int allMatches = 0;
+
 
         private int UdpPort;
         private string UdpIp;
         private int HttpPort;
         private string HttpIp;
         private const int maxMisses = 20;
+
+        private static Mutex mut = new Mutex();
 
         public ConversationPage(LoginWindow loginWindow, MainWindowPage main, string userName)
         {
@@ -259,11 +264,18 @@ namespace FaceItGUI
                 BackToMainWindow();
                 return;
             }
+            mut.WaitOne();
+            var values = new Dictionary<string, string>
+            {
+                { "checks", allChecks.ToString() },
+                { "matches", allMatches.ToString() }
+            };
+            mut.ReleaseMutex();
+            var content = new FormUrlEncodedContent(values);
             string httpStopRequest = "http://" + this.HttpIp + ":" + this.HttpPort + "/stop";
             try
             {
-                var response = await client.GetAsync(httpStopRequest);
-
+                var response = await client.PostAsync(httpStopRequest, content);
                 var responseString = await response.Content.ReadAsStringAsync();
                 switch (response.StatusCode)
                 {
@@ -502,7 +514,8 @@ namespace FaceItGUI
                 
                 if (numOfPeopleToCheck == 0.0)
                     return;
-
+                mut.WaitOne();
+                allChecks++;
                 // average
                 //int avgMatch = sumMatch / numOfPeopleToCheck;
 
@@ -510,6 +523,7 @@ namespace FaceItGUI
                 // match most of participants
                 if (matchedPeople >= numOfPeopleToCheck / 2.0)
                 {
+                    allMatches++;
                     //good match
                     Dispatcher.BeginInvoke(new Action(delegate ()
                     {
@@ -524,6 +538,7 @@ namespace FaceItGUI
                         matchText.Text = "You need to adjust your\n behaviors to the\n conversation!";
                     }));
                 }
+                mut.ReleaseMutex();
             }
         }
 

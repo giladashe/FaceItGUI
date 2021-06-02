@@ -124,55 +124,5 @@ namespace FaceItGUI
             this.loginWin.Content = loginContent;
         }
 
-
-        /*private string HashPassword(string password)
-        {
-            // generate a 128-bit salt using a secure PRNG
-            byte[] salt = new byte[128 / 8];
-            using (var rng = RandomNumberGenerator.Create())
-            {
-                rng.GetBytes(salt);
-            }
-            Console.WriteLine($"Salt: {Convert.ToBase64String(salt)}");
-
-            // derive a 256-bit subkey (use HMACSHA1 with 10,000 iterations)
-            string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-                password: password,
-                salt: salt,
-                prf: KeyDerivationPrf.HMACSHA256,
-                iterationCount: 10000,
-                numBytesRequested: 256 / 8));
-            Console.WriteLine($"Hashed: {hashed}");
-            return hashed;
-        }*/
-
-
-        /*private bool ArePasswordsEqual(string inputPassword, string dbPassword)
-        {
-            Fetch the stored value
-            // string savedPasswordHash = DBContext.GetUser(u => u.UserName == user).Password;
-             Extract the bytes
-            byte[] hashBytes = Convert.FromBase64String(dbPassword);
-            Get the salt
-            byte[] salt = new byte[16];
-            Array.Copy(hashBytes, 0, salt, 0, 16);
-            Compute the hash on the password the user entered
-           var pbkdf2 = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-               password: password,
-               salt: salt,
-               prf: KeyDerivationPrf.HMACSHA256,
-               iterationCount: 10000,
-               numBytesRequested: 256 / 8));
-            byte[] hash = pbkdf2.GetBytes(20);
-            Compare the results
-            for (int i = 0; i < 20; i++)
-                if (hashBytes[i + 16] != hash[i])
-                    throw new UnauthorizedAccessException()
-        }*/
     }
 }
-
-
-
-//  hash(password + salt)
-// username password - login == salt
