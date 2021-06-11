@@ -26,18 +26,19 @@
         </Border>
         <Border Grid.Column ="0" Background="#1f3d7a"/>
         <Border x:Name="namesListBorder" Grid.Row="1" Grid.ColumnSpan="2" Background="#152951" >
-            <ListBox x:Name="namesList" Background="#152951" >
+            <ListBox x:Name="namesList" Background="#152951" HorizontalContentAlignment="Center">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Grid x:Name="listGrid" Background="#2f5cb6" Margin="0,2" >
-
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="2*" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock FontSize="30" Grid.Column="0" HorizontalAlignment="Center" Text="{Binding Name, StringFormat='{}{0}\ - '}" />
-                            <TextBlock FontSize="30" Grid.Column="1" HorizontalAlignment="Center" Text="{Binding Feeling}" />
-                        </Grid>
+                        <Border Background="#2f5cb6">
+                            <TextBlock FontSize="30" TextAlignment="Center">
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0} - {1}">
+                                        <Binding Path="Name" />
+                                        <Binding Path="Feeling" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </Border>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>

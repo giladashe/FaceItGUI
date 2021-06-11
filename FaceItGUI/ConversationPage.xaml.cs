@@ -42,7 +42,6 @@ namespace FaceItGUI
         private ConcurrentDictionary<string, int> missesRecognition;
 
         private bool stop = false, startCheck = false;
-        private string currentName;
         private readonly string userName;
         private ConcurrentDictionary<string, string> namesMap;
         private static readonly HttpClient client = new HttpClient();
@@ -107,10 +106,11 @@ namespace FaceItGUI
 
         private async void MyButton_Click(object sender, RoutedEventArgs e)
         {
+            string currentName = string.Empty;
             var button = (System.Windows.Controls.Button)sender;
             if (button.Name == "meButton")
             {
-                currentName = userName;
+                currentName = "You";
             }
             else if (nameBox.Text == string.Empty)
             {
@@ -175,9 +175,8 @@ namespace FaceItGUI
             }
             int maxUdpDatagramSize = 65515;
 
-            if (currentName == userName)
+            if (currentName == "You")
             {
-                currentName = "Y" + currentName;
                 isLoginUser = true;
                 meButton.Visibility = Visibility.Hidden;
                 snipMeTxt.Visibility = Visibility.Hidden;
@@ -188,14 +187,12 @@ namespace FaceItGUI
             }
             else
             {
-                currentName = "N" + currentName;
                 checkMatchBtn.Visibility = Visibility.Visible;
             }
 
             new Thread(async delegate ()
             {
                 int round = 0;
-                string thisName = currentName;
                 while (!stop)
                 {
                     // takes picture every 0.5 second 
@@ -206,11 +203,11 @@ namespace FaceItGUI
                         int numOfEndLines = 2;
                         string localDateStr = localDate.ToString();
                         System.Drawing.Image image = SnippingTool.FromRectangle(myFrame.Frame);
-                        while (ImageToByte(image).Length + thisName.Length + localDateStr.Length + numOfEndLines > maxUdpDatagramSize)
+                        while (ImageToByte(image).Length + currentName.Length + localDateStr.Length + numOfEndLines > maxUdpDatagramSize)
                         {
                             image = ReduceImageSize(0.9, image);
                         }
-                        WriteToServer(image, thisName, localDateStr, index, round, isLoginUser);
+                        WriteToServer(image, currentName, localDateStr, index, round, isLoginUser);
 
                         round++;
                     }
@@ -330,7 +327,7 @@ namespace FaceItGUI
 
 
 
-        public async void WriteToServer(System.Drawing.Image image, string name, string fileName, int index, int round, bool isLoginUser)
+        public async void WriteToServer(System.Drawing.Image image, string name, string dateTime, int index, int round, bool isLoginUser)
         {
             if (image != null)
             {
@@ -338,7 +335,9 @@ namespace FaceItGUI
                 {
                     UdpClient udpClient = new UdpClient();
                     udpClient.Connect(UdpIp, UdpPort);
-                    byte[] dataName = Encoding.ASCII.GetBytes(name + "\n" + fileName + "\n");
+                    // if the login user sends it sends only "Y", else send name
+                    string nameToSend = isLoginUser ? "Y" : name;
+                    byte[] dataName = Encoding.ASCII.GetBytes(nameToSend + "\n" + dateTime + "\n");
                     //bytes 0xFF, 0xD9 indicate end of image
                     byte[] dataImage = ImageToByte(image);
                     byte[] bytes = new byte[dataName.Length + dataImage.Length];
@@ -351,8 +350,6 @@ namespace FaceItGUI
                     var message = Encoding.ASCII.GetString(result.Buffer, 0, result.Buffer.Length);
                     await Dispatcher.BeginInvoke(new Action(delegate ()
                     {
-                        // remove 'Y'/'N'
-                        name = name.Substring(1);
                         bool goodVibe = (message == "happy" || message == "surprise");
                         bool neutral = (message == "neutral");
                         bool foundFace = false;
