@@ -14,6 +14,6 @@
         <Button HorizontalAlignment="Center" FontSize="50">Show Statistics</Button>
         <Button HorizontalAlignment="Center" FontSize="50">Prepare for special event</Button>
         <Button HorizontalAlignment="Center" FontSize="50" Click="Exit">Exit</Button>
-
+        <Label x:Name="errorTxt" FontSize="20" Margin="0,5" Content="" HorizontalContentAlignment="center"  Foreground="Red"/>
     </StackPanel>
 </Page>

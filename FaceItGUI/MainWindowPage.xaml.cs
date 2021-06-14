@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -21,6 +24,9 @@ namespace FaceItGUI
         private LoginWindow login;
         private string userName;
         private object loginContent;
+        private readonly int Port;
+        private readonly string Ip;
+        private static readonly HttpClient client = new HttpClient();
 
         public MainWindowPage(LoginWindow loginWin, string userName)
         {
@@ -28,23 +34,40 @@ namespace FaceItGUI
             this.login = loginWin;
             this.loginContent = loginWin.Content;
             this.userName = userName;
+            this.Ip = ConfigurationManager.AppSettings["HttpIp"];
+            this.Port = Convert.ToInt32(ConfigurationManager.AppSettings["HttpPort"]);
             InitializeComponent();
             welcometxt.Content = $"Welcome {userName}!";
 
         }
 
-        private void StartConversation(object sender, RoutedEventArgs e)
+        private async void StartConversation(object sender, RoutedEventArgs e)
         {
-            login.Content = new ConversationPage(login,this, userName);
+            string httpLoginRequest = "https://" + this.Ip + ":" + this.Port + "/start";
+            try
+            {
+                var response = await client.GetAsync(httpLoginRequest);
+
+                var responseString = await response.Content.ReadAsStringAsync();
+                switch (response.StatusCode)
+                {
+                    case HttpStatusCode.OK:
+                            login.Content = new ConversationPage(login, this, userName);
+                        break;
+                    default:
+                        errorTxt.Content = "Problem with connection to server";
+                        break;
+                }
+            }
+            catch
+            {
+                errorTxt.Content = "Problem with connection to server";
+            }
         }
 
         private void Exit(object sender, RoutedEventArgs e)
         {
-            /*  LoginWindow window = new LoginWindow();
-              this.login.Close();
-              window.Show();*/
             this.login.Content = loginContent;
-
         }
     }
 }

@@ -53,7 +53,7 @@ namespace FaceItGUI
                 errorTxt.Content = "All fields are mandatory!";
                 return;
             }
-            string httpLoginRequest = "http://" + this.Ip + ":" + this.Port + "/login?username=" + userName + "&password=" + password;
+            string httpLoginRequest = "https://" + this.Ip + ":" + this.Port + "/login?username=" + userName + "&password=" + password;
             try
             {
                 var response = await client.GetAsync(httpLoginRequest);

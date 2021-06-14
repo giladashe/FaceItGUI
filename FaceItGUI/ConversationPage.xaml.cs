@@ -199,9 +199,10 @@ namespace FaceItGUI
                     Thread.Sleep(500);
                     try
                     {
-                        long localDate = DateTime.Now.Ticks;
+                        //long localDate = DateTime.Now.Ticks;
+                        string localDateStr = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss");
                         int numOfEndLines = 2;
-                        string localDateStr = localDate.ToString();
+                        //string localDateStr = localDate.ToString();
                         System.Drawing.Image image = SnippingTool.FromRectangle(myFrame.Frame);
                         while (ImageToByte(image).Length + currentName.Length + localDateStr.Length + numOfEndLines > maxUdpDatagramSize)
                         {
@@ -269,7 +270,7 @@ namespace FaceItGUI
             };
             mut.ReleaseMutex();
             var content = new FormUrlEncodedContent(values);
-            string httpStopRequest = "http://" + this.HttpIp + ":" + this.HttpPort + "/stop";
+            string httpStopRequest = "https://" + this.HttpIp + ":" + this.HttpPort + "/stop";
             try
             {
                 var response = await client.PostAsync(httpStopRequest, content);

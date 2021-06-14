@@ -64,12 +64,11 @@ namespace FaceItGUI
             {
                 { "userName", userName },
                 { "password", password },
-                //{ "salt", salt},
                 { "email", email }
             };
 
             var content = new FormUrlEncodedContent(values);
-            string httpRegisterPost = "http://" + this.Ip + ":" + this.Port + "/register";
+            string httpRegisterPost = "https://" + this.Ip + ":" + this.Port + "/register";
             try
             {
                 var response = await client.PostAsync(httpRegisterPost, content);
