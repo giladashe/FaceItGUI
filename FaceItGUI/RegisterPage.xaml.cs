@@ -68,7 +68,7 @@ namespace FaceItGUI
             };
 
             var content = new FormUrlEncodedContent(values);
-            string httpRegisterPost = "https://" + this.Ip + ":" + this.Port + "/register";
+            string httpRegisterPost = "http://" + this.Ip + ":" + this.Port + "/register";
             try
             {
                 var response = await client.PostAsync(httpRegisterPost, content);

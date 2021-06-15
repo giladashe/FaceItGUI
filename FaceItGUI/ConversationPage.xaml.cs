@@ -270,7 +270,7 @@ namespace FaceItGUI
             };
             mut.ReleaseMutex();
             var content = new FormUrlEncodedContent(values);
-            string httpStopRequest = "https://" + this.HttpIp + ":" + this.HttpPort + "/stop";
+            string httpStopRequest = "http://" + this.HttpIp + ":" + this.HttpPort + "/stop";
             try
             {
                 var response = await client.PostAsync(httpStopRequest, content);
