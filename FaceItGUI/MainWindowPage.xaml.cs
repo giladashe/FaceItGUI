@@ -43,7 +43,7 @@ namespace FaceItGUI
 
         private async void StartConversation(object sender, RoutedEventArgs e)
         {
-            string httpLoginRequest = "https://" + this.Ip + ":" + this.Port + "/start";
+            string httpLoginRequest = "http://" + this.Ip + ":" + this.Port + "/start?username=" + this.userName;
             try
             {
                 var response = await client.GetAsync(httpLoginRequest);

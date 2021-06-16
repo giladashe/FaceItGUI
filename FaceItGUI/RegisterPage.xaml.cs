@@ -72,7 +72,7 @@ namespace FaceItGUI
             //handler.ClientCertificates.Add(certificate);
             //HttpClient client = new HttpClient(handler);
             var content = new FormUrlEncodedContent(values);
-            string httpRegisterPost = "https://" + this.Ip + ":" + this.Port + "/register";
+            string httpRegisterPost = "http://" + this.Ip + ":" + this.Port + "/register";
             try
             {
                 var response = await client.PostAsync(httpRegisterPost, content);
