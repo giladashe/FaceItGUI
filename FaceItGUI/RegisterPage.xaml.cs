@@ -14,6 +14,7 @@ using System.Net.Http;
 using System.Configuration;
 using System.Net;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 
 namespace FaceItGUI
 {
@@ -66,7 +67,10 @@ namespace FaceItGUI
                 { "password", password },
                 { "email", email }
             };
-
+            //WebRequestHandler handler = new WebRequestHandler();
+            //X509Certificate certificate = X509Certificate.CreateFromCertFile("");
+            //handler.ClientCertificates.Add(certificate);
+            //HttpClient client = new HttpClient(handler);
             var content = new FormUrlEncodedContent(values);
             string httpRegisterPost = "https://" + this.Ip + ":" + this.Port + "/register";
             try
