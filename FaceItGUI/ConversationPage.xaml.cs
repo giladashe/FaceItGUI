@@ -395,13 +395,13 @@ namespace FaceItGUI
 
                         if (startCheck)
                         {
-                            // check matching to others every 15 rounds
-                            bool needToCheck = (isLoginUser && round % 15 == 0);
+                            // check matching to others every 10 rounds
+                            bool needToCheck = (isLoginUser && round % 10 == 0);
                             AddAndCheckMatch(name, neutral, goodVibe, isLoginUser, needToCheck);
                         }
 
-                        // changes the feeling on screen according to most feelings he had the last 15 rounds
-                        if (round % 10 == 0 || round == 1)
+                        // changes the feeling on screen according to most feelings he had the last 5 rounds
+                        if (round % 5 == 0 || round == 1)
                         {
                             int maxPropertyValue = -1;
                             //PropertyInfo maxProperty = (properties[0].Name != "Match") ? properties[0] : properties[1];
