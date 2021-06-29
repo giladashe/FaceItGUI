@@ -69,5 +69,10 @@ namespace FaceItGUI
         {
             this.login.Content = loginContent;
         }
+
+        private void ShowStatistics(object sender, RoutedEventArgs e)
+        {
+            login.Content = new StatisticsHome(login, this, userName);
+        }
     }
 }
