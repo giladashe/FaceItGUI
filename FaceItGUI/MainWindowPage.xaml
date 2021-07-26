@@ -12,7 +12,6 @@
         <Label x:Name="welcometxt" Content="MainWindow" FontSize="70" HorizontalAlignment="Center" FontWeight="Bold" Margin="2,5,2,0" VerticalContentAlignment="Bottom"/>
         <Button HorizontalAlignment="Center" FontSize="50" Click="StartConversation">Start conversation</Button>
         <Button HorizontalAlignment="Center" FontSize="50" Click="ShowStatistics">Show Statistics</Button>
-        <Button HorizontalAlignment="Center" FontSize="50">Prepare for special event</Button>
         <Button HorizontalAlignment="Center" FontSize="50" Click="Exit">Exit</Button>
         <Label x:Name="errorTxt" FontSize="20" Margin="0,5" Content="" HorizontalContentAlignment="center"  Foreground="Red"/>
     </StackPanel>
