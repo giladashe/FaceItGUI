@@ -6,7 +6,7 @@
       xmlns:local="clr-namespace:FaceItGUI"
       mc:Ignorable="d" 
       d:DesignHeight="500" d:DesignWidth="900"
-      Title="Page1">
+      Title="FaceIt">
 
     <Grid>
         <Grid.ColumnDefinitions>
