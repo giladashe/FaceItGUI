@@ -50,7 +50,7 @@ namespace FaceItGUI
         private System.Timers.Timer blankSpaceTimer;
         private int allChecks = 0;
         private int allMatches = 0;
-
+        private Queue<string> errors = new Queue<string>();
 
         private int UdpPort;
         private string UdpIp;
@@ -58,7 +58,11 @@ namespace FaceItGUI
         private string HttpIp;
         private const int maxMisses = 20;
 
-        private static Mutex mut = new Mutex();
+        private static Mutex checksMutex = new Mutex();
+        private static Mutex errorsMutex = new Mutex();
+        private static Mutex errorTextMutex = new Mutex();
+
+
 
         public ConversationPage(LoginWindow loginWindow, MainWindowPage main, string userName)
         {
@@ -75,6 +79,8 @@ namespace FaceItGUI
             this.blankSpaceTimer = null;
             allBehaviors = new ConcurrentDictionary<string, Behaviors>();
             missesRecognition = new ConcurrentDictionary<string, int>();
+            Thread t = new Thread(ShowErrors);
+            t.Start();
         }
 
         public async Task<int> AddToNamesList(string name)
@@ -117,10 +123,13 @@ namespace FaceItGUI
                 await Dispatcher.BeginInvoke(new Action(delegate ()
                 {
                     string message = "Write the name first!";
-                    if (Math.Abs((DateTime.Now - this.lastTime).TotalSeconds) > 5 && errorTxt.Text != message)
+                    errorsMutex.WaitOne();
+                    errors.Enqueue(message);
+                    errorsMutex.ReleaseMutex();
+                    /*if (Math.Abs((DateTime.Now - this.lastTime).TotalSeconds) > 5 && errorTxt.Text != message)
                     {
                         errorTxt.Text = message;
-                    }
+                    }*/
                 }));
                 return;
             }
@@ -129,6 +138,7 @@ namespace FaceItGUI
                 await Dispatcher.BeginInvoke(new Action(delegate ()
                 {
                     currentName = nameBox.Text;
+                    nameBox.Text = string.Empty;
                 }));
             }
             if (namesMap.ContainsKey(currentName))
@@ -136,11 +146,14 @@ namespace FaceItGUI
                 System.Diagnostics.Debug.WriteLine(currentName + " already exists");
                 await Dispatcher.BeginInvoke(new Action(delegate ()
                 {
-                    string message = $"{currentName} already exists";
-                    if (Math.Abs((DateTime.Now - this.lastTime).TotalSeconds) > 5 && errorTxt.Text != message)
+                    string message = $"The name {currentName} already exists";
+                    errorsMutex.WaitOne();
+                    errors.Enqueue(message);
+                    errorsMutex.ReleaseMutex();
+                    /*if (Math.Abs((DateTime.Now - this.lastTime).TotalSeconds) > 5 && errorTxt.Text != message)
                     {
                         errorTxt.Text = message;
-                    }
+                    }*/
                 }));
                 return;
             }
@@ -166,10 +179,13 @@ namespace FaceItGUI
                 await Dispatcher.BeginInvoke(new Action(delegate ()
                 {
                     string message = $"{currentName} already exists";
-                    if (Math.Abs((DateTime.Now - this.lastTime).TotalSeconds) > 5 && errorTxt.Text != message)
+                    errorsMutex.WaitOne();
+                    errors.Enqueue(message);
+                    errorsMutex.ReleaseMutex();
+                   /* if (Math.Abs((DateTime.Now - this.lastTime).TotalSeconds) > 5 && errorTxt.Text != message)
                     {
                         errorTxt.Text = message;
-                    }
+                    }*/
                 }));
                 return;
             }
@@ -181,7 +197,9 @@ namespace FaceItGUI
                 meButton.Visibility = Visibility.Hidden;
                 snipMeTxt.Visibility = Visibility.Hidden;
                 othersTxt.Visibility = Visibility.Visible;
-                nameBox.Visibility = Visibility.Visible;
+                //todo: 
+                borderNameBox.Visibility = Visibility.Visible;
+                //nameBox.Visibility = Visibility.Visible;
                 othersButton.Visibility = Visibility.Visible;
 
             }
@@ -216,11 +234,14 @@ namespace FaceItGUI
                     {
                         await Dispatcher.BeginInvoke(new Action(delegate ()
                         {
-                            string message = "Connection problem\nwith server";
-                            if (Math.Abs((DateTime.Now - this.lastTime).TotalSeconds) > 5 && errorTxt.Text != message)
-                            {
-                                errorTxt.Text = message;
-                            }
+                            string message = "Connection problem with server";
+                            errorsMutex.WaitOne();
+                            errors.Enqueue(message);
+                            errorsMutex.ReleaseMutex();
+                            //if (Math.Abs((DateTime.Now - this.lastTime).TotalSeconds) > 5 && errorTxt.Text != message)
+                            //{
+                            //    errorTxt.Text = message;
+                            //}
 
                         }));
                         System.Diagnostics.Debug.WriteLine("problem: " + excep.Message);
@@ -262,13 +283,13 @@ namespace FaceItGUI
                 BackToMainWindow();
                 return;
             }
-            mut.WaitOne();
+            checksMutex.WaitOne();
             var values = new Dictionary<string, string>
             {
                 { "checks", allChecks.ToString() },
                 { "matches", allMatches.ToString() }
             };
-            mut.ReleaseMutex();
+            checksMutex.ReleaseMutex();
             var content = new FormUrlEncodedContent(values);
             string httpStopRequest = "http://" + this.HttpIp + ":" + this.HttpPort + "/stop";
             try
@@ -284,23 +305,31 @@ namespace FaceItGUI
                     case HttpStatusCode.BadRequest:
                         await Dispatcher.BeginInvoke(new Action(delegate ()
                         {
-                            string message = "Server has problem with\n the DB";
-                            if (Math.Abs((DateTime.Now - this.lastTime).TotalSeconds) > 5 && errorTxt.Text != message)
+                            string message = "Server has problem with  the DB";
+                            errorsMutex.WaitOne();
+                            errors.Enqueue(message);
+                            errorsMutex.ReleaseMutex();
+                           /* if (Math.Abs((DateTime.Now - this.lastTime).TotalSeconds) > 5 && errorTxt.Text != message)
                             {
                                 errorTxt.Text = message;
-                            }
+                            }*/
                         }));
+                        BackToMainWindow();
                         break;
                     default:
                         await Dispatcher.BeginInvoke(new Action(delegate ()
                         {
-                            string message = "Connection problem\nwith server";
-                            if (Math.Abs((DateTime.Now - this.lastTime).TotalSeconds) > 5 && errorTxt.Text != message)
+                            string message = "Connection problem with server";
+                            errorsMutex.WaitOne();
+                            errors.Enqueue(message);
+                            errorsMutex.ReleaseMutex();
+                            /*if (Math.Abs((DateTime.Now - this.lastTime).TotalSeconds) > 5 && errorTxt.Text != message)
                             {
                                 errorTxt.Text = message;
-                            }
+                            }*/
                            
                         }));
+                        BackToMainWindow();
                         break;
                 }
             }
@@ -308,13 +337,17 @@ namespace FaceItGUI
             {
                 await Dispatcher.BeginInvoke(new Action(delegate ()
                 {
-                    string message = "Connection problem\nwith server";
-                    if (Math.Abs((DateTime.Now - this.lastTime).TotalSeconds) > 5 && errorTxt.Text != message)
+                    string message = "Connection problem with server";
+                    errorsMutex.WaitOne();
+                    errors.Enqueue(message);
+                    errorsMutex.ReleaseMutex();
+                    /*if (Math.Abs((DateTime.Now - this.lastTime).TotalSeconds) > 5 && errorTxt.Text != message)
                     {
                         errorTxt.Text = message;
-                    }
+                    }*/
 
                 }));
+                BackToMainWindow();
             }
 
 
@@ -384,11 +417,23 @@ namespace FaceItGUI
                         {
                             Dispatcher.BeginInvoke(new Action(delegate ()
                             {
-                                string message = $"Couldn't recognize\n {name}'s face";
+                               /* //todo: check this
+                                string nameError = name;
+                                if (name == "You")
+                                {
+                                    nameError = "your";
+                                }
+                                else
+                                {
+                                    nameError = $"{name}'s";
+                                }
+                                string message = $"Couldn't recognize\n {nameError} face";
                                 if (Math.Abs((DateTime.Now - this.lastTime).TotalSeconds) > 5 && errorTxt.Text != message)
                                 {
                                     errorTxt.Text = message;
-                                }
+                                }*/
+                                ((NameInList)namesList.Items[index]).Feeling = "Not Recognized";
+                                missesRecognition[name] = 0;
                             }));
                             return;
                         }
@@ -439,11 +484,14 @@ namespace FaceItGUI
                 {
                     await Dispatcher.BeginInvoke(new Action(delegate ()
                     {
-                        string message = "Connection problem\nwith server";
-                        if (Math.Abs((DateTime.Now - this.lastTime).TotalSeconds) > 5 && errorTxt.Text != message)
+                        string message = "Connection problem with the server";
+                        errorsMutex.WaitOne();
+                        errors.Enqueue(message);
+                        errorsMutex.ReleaseMutex();
+                       /* if (Math.Abs((DateTime.Now - this.lastTime).TotalSeconds) > 5 && errorTxt.Text != message)
                         {
                             errorTxt.Text = message;
-                        }
+                        }*/
                         System.Diagnostics.Debug.WriteLine(e.Message);
 
                     }));
@@ -470,9 +518,12 @@ namespace FaceItGUI
         {
             othersButton.Visibility = Visibility.Hidden;
             othersTxt.Visibility = Visibility.Hidden;
-            nameBox.Visibility = Visibility.Hidden;
+            //TODO:
+            borderNameBox.Visibility = Visibility.Hidden;
+            //nameBox.Visibility = Visibility.Hidden;
             checkMatchBtn.Visibility = Visibility.Hidden;
             othersButton.Visibility = Visibility.Hidden;
+            checking.Visibility = Visibility.Visible;
             startCheck = true;
         }
 
@@ -512,7 +563,7 @@ namespace FaceItGUI
                 
                 if (numOfPeopleToCheck == 0.0)
                     return;
-                mut.WaitOne();
+                checksMutex.WaitOne();
                 allChecks++;
                 // average
                 //int avgMatch = sumMatch / numOfPeopleToCheck;
@@ -525,7 +576,7 @@ namespace FaceItGUI
                     //good match
                     Dispatcher.BeginInvoke(new Action(delegate ()
                     {
-                        matchText.Text = "You match your\n interlocutors :)";
+                        matchText.Text = "You match your interlocutors!";
                     }));
                 }
                 else
@@ -533,10 +584,10 @@ namespace FaceItGUI
                     Dispatcher.BeginInvoke(new Action(delegate ()
                     {
                         //bad match
-                        matchText.Text = "You need to adjust your\n behaviors to the\n conversation!";
+                        matchText.Text = "Adjust your behaviors!";
                     }));
                 }
-                mut.ReleaseMutex();
+                checksMutex.ReleaseMutex();
             }
         }
 
@@ -545,6 +596,39 @@ namespace FaceItGUI
             MemoryStream mMemoryStream = new MemoryStream();
             iImage.Save(mMemoryStream, System.Drawing.Imaging.ImageFormat.Jpeg);
             return mMemoryStream.ToArray();
+        }
+
+
+        private void Grid_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                this.parentWindow.DragMove();
+            }
+        }
+
+        private void ShowErrors()
+        {
+            while (!stop)
+            {
+                while (errors.Count() > 0)
+                {
+                    errorsMutex.WaitOne();
+                    string error = errors.Dequeue();
+                    errorsMutex.ReleaseMutex();
+                    Dispatcher.Invoke(new Action(delegate ()
+                    {
+                        errorTxt.Text = error;
+                    }));
+                    Thread.Sleep(4000);
+                    Dispatcher.Invoke(new Action(delegate ()
+                    {
+                        errorTxt.Text = string.Empty;
+                    }));
+                }
+                Thread.Sleep(2000);
+            }
+
         }
     }
 }

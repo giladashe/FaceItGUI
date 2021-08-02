@@ -8,6 +8,7 @@ namespace FaceItGUI
     public class NameInList : INotifyPropertyChanged
     {
         private string _feeling;
+       // private string _recognized;
 
         public string Name { get; set; }
         public string Feeling
@@ -22,6 +23,20 @@ namespace FaceItGUI
                 NotifyPropertyChanged("Feeling");
             }
         }
+
+       /* public string Recognized
+        {
+            get
+            {
+                return _recognized;
+            }
+            set
+            {
+                _recognized = value;
+                NotifyPropertyChanged("Recognized");
+            }
+        }*/
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void NotifyPropertyChanged(String info)

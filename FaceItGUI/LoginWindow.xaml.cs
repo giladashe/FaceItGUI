@@ -50,7 +50,7 @@ namespace FaceItGUI
 
             if (userName == string.Empty || password == string.Empty)
             {
-                errorTxt.Content = "All fields are mandatory!";
+                errorTxt.Content = "Missing fields!";
                 return;
             }
             string httpLoginRequest = "http://" + this.Ip + ":" + this.Port + "/login?username=" + userName + "&password=" + password;
@@ -76,13 +76,13 @@ namespace FaceItGUI
                         errorTxt.Content = "DB connection problem";
                         break;
                     default:
-                        errorTxt.Content = "Problem with connection to server";
+                        errorTxt.Content = "Connection Problem";
                         break;
                 }
             }
             catch
             {
-                errorTxt.Content = "Problem with connection to server";
+                errorTxt.Content = "Connection Problem";
             }
 
         }
@@ -106,6 +106,13 @@ namespace FaceItGUI
         {
             this.Close();
         }
-  
+
+        private void Grid_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if(e.LeftButton == MouseButtonState.Pressed)
+            {
+                DragMove();
+            }
+        }
     }
 }

@@ -5,14 +5,245 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:FaceItGUI"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
-      Title="MainWindowPage" Background="#007fff">
+      d:DesignHeight="500" d:DesignWidth="900"
+      Title="MainWindowPage" Background="#181735">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
 
-    <StackPanel>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Background="#0F0F2D"
+            Grid.ColumnSpan="2" MouseDown="Grid_MouseDown">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <Button Content="Exit"
+                Foreground="white"
+                FontSize="12"
+                FontWeight="Medium"
+                Margin="0,0,10,0"
+                Grid.Column="12"
+                Grid.ColumnSpan="2" Click="Exit">
+
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="TextElement.FontFamily" Value="Fonts/#Dosis"/>
+                        <Setter Property="Background" Value="#FE6584"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#FF4C70"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Border Width="75" Height="15"
+                                    CornerRadius="8"
+                                    Background="{TemplateBinding Background}">
+                            <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+
+        </Grid>
+
+        <StackPanel Grid.Row="1" Grid.Column="0"
+                VerticalAlignment="Center" Grid.ColumnSpan="2"
+                Margin="60,0,60,0" Height="423">
+
+            <StackPanel>
+                <StackPanel Orientation="Horizontal"
+                    Margin="0,0,0,20" HorizontalAlignment="Center">
+                    <Image Width="80" Height="80"
+                           RenderOptions.BitmapScalingMode="Fant" Source="/Images/facial-recognition-icon.jpg"></Image>
+                    <TextBlock Text="Welcome Steve!"
+                       Foreground="White"
+                       FontSize="70"
+                       FontWeight="Medium"
+                       VerticalAlignment="center"
+                       FontFamily="Fonts/#Dosis"
+                       Margin="10,0,0,0" x:Name="welcometxt" />
+                </StackPanel>
+
+
+
+                <TextBlock Text="What do you wanna do today?"
+                       Foreground="White"
+                       FontSize="40"
+                       FontWeight="Medium"
+                       VerticalAlignment="center"
+                       HorizontalAlignment="Center"
+                       FontFamily="Fonts/#Dosis"
+                       Margin="10,0,0,0"></TextBlock>
+
+            </StackPanel>
+
+            <StackPanel Orientation="Horizontal"
+             Margin="0,15,0,0" HorizontalAlignment="Center">
+                <Button Content="Start Conversation"
+                Foreground="white"
+                FontSize="27"
+                FontWeight="Medium"
+                Margin="40,0,80,0" Click="StartConversation" BorderBrush="white">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="TextElement.FontFamily" Value="Fonts/#Dosis"/>
+                            <Setter Property="Background">
+                                <Setter.Value>
+                                    <ImageBrush ImageSource="/Images/video_conference_2.jpg" Opacity="0.5"/>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Cursor" Value="Hand"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background">
+                                        <Setter.Value>
+                                            <ImageBrush ImageSource="/Images/video_conference_2.jpg" Opacity="0.7"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Width="250" Height="200"
+                                    CornerRadius="12"
+                                    Background="{TemplateBinding Background}">
+                                <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
+                <Button Content="Statistics"
+                Foreground="white"
+                FontSize="30"
+                FontWeight="Medium" Click="ShowStatistics" Margin="10">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="TextElement.FontFamily" Value="Fonts/#Dosis"/>
+                            <Setter Property="Background">
+                                <Setter.Value>
+                                    <ImageBrush ImageSource="/Images/statistics_1.jpg" Opacity="0.5"/>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="Cursor" Value="Hand"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background">
+                                        <Setter.Value>
+                                            <ImageBrush ImageSource="/Images/statistics_1.jpg" Opacity="0.7"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border  Width="250" Height="200"
+                                    CornerRadius="12"
+                                    Background="{TemplateBinding Background}">
+                                <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
+            </StackPanel>
+            <Label x:Name="errorTxt" FontSize="20" Margin="0,5,5,10" Content=""
+HorizontalContentAlignment="center"  VerticalContentAlignment="Center" Foreground="Red"  />
+        </StackPanel>
+
+        <Grid Grid.Column="1"
+          Grid.RowSpan="2"
+          Margin="160, -365, -610, 85"
+          Panel.ZIndex="0">
+
+            <Grid.RenderTransform>
+                <RotateTransform Angle="50"/>
+            </Grid.RenderTransform>
+
+            <StackPanel Orientation="Horizontal"
+                        Margin="-350, 250, -255, -250">
+
+                <StackPanel>
+                    <Border Width="700"
+                            Height="35"
+                            Background="Transparent"
+                            Margin="150,0,0,0"
+                            CornerRadius="20"/>
+
+                    <Border Width="700"
+                            Height="35"
+                            Background="Transparent"
+                            Margin="0,15,0,0"
+                            CornerRadius="20"/>
+
+                    <Border Width="700"
+                            Height="35"
+                            Background="Transparent"
+                            Margin="75,15,0,0"
+                            CornerRadius="20"/>
+                </StackPanel>
+
+                <StackPanel>
+                    <Border Width="520"
+                            Height="35"
+                            Background="#3DDDC2"
+                            Margin="150,0,0,0"
+                            CornerRadius="20"/>
+
+                    <Border Width="500"
+                            Height="35"
+                            Background="#FC6586"
+                            Margin="0,15,0,0"
+                            CornerRadius="20"/>
+
+                    <Border Width="700"
+                            Height="35"
+                            Background="Transparent"
+                            Margin="75,15,0,0"
+                            CornerRadius="20"/>
+
+                </StackPanel>
+
+            </StackPanel>
+        </Grid>
+    </Grid>
+    <!--<StackPanel>
         <Label x:Name="welcometxt" Content="MainWindow" FontSize="70" HorizontalAlignment="Center" FontWeight="Bold" Margin="2,5,2,0" VerticalContentAlignment="Bottom"/>
         <Button HorizontalAlignment="Center" FontSize="50" Click="StartConversation">Start conversation</Button>
         <Button HorizontalAlignment="Center" FontSize="50" Click="ShowStatistics">Show Statistics</Button>
         <Button HorizontalAlignment="Center" FontSize="50" Click="Exit">Exit</Button>
         <Label x:Name="errorTxt" FontSize="20" Margin="0,5" Content="" HorizontalContentAlignment="center"  Foreground="Red"/>
-    </StackPanel>
+    </StackPanel>-->
 </Page>
