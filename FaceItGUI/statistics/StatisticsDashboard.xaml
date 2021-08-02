@@ -1,0 +1,181 @@
+﻿<Page x:Class="FaceItGUI.statistics.StatisticsDashboard"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:FaceItGUI.statistics"
+      xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800" 
+      Title="StatisticsDashboard"
+      Background="#181735">
+
+    <Grid>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="30"/>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <!--TextBlock Grid.Row="1" Grid.ColumnSpan="2"
+                       Text="FaceIt"
+                       Foreground="White"
+                       FontSize="20"
+                       FontWeight="Medium"
+                       VerticalAlignment="center"
+                       HorizontalAlignment="Center"
+                       FontFamily="Fonts/#Dosis"
+                       Margin="10,0,0,0"></-->
+
+        <!--ComboBox Grid.Row="2"
+                  Name="comboBoxTime"
+                  IsEditable="True"
+                  FontSize="20" FontWeight="Medium" FontFamily="Fonts/#Dosis"
+                  VerticalContentAlignment="Center" HorizontalAlignment="Left"
+                  IsReadOnly="True"
+                  Text="Select time"
+                  SelectionChanged="ComboBox_SelectionChanged"
+                  Width="114" Margin="8,65,0,94"
+                  >
+            <ComboBoxItem Content="Last Call" FontSize="15"/>
+            <ComboBoxItem Content="Last Week" FontSize="15"/>
+            <ComboBoxItem Content="Last Month" FontSize="15"/>
+
+            <ComboBox.Template>
+                <ControlTemplate TargetType="ComboBox">
+                    <Border Width="75" Height="15"
+                                    CornerRadius="8"
+                                    Background="{TemplateBinding Background}">
+                        <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </>
+
+        </ComboBox-->
+
+
+        <Grid Background="#0F0F2D"
+            Grid.ColumnSpan="2">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <Button Content="Exit"
+                Foreground="white"
+                FontSize="12"
+                FontWeight="Medium"
+                Margin="0,0,10,0"
+                Grid.Column="12"
+                Grid.ColumnSpan="2">
+
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="TextElement.FontFamily" Value="Fonts/#Dosis"/>
+                        <Setter Property="Background" Value="#FE6584"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#FF4C70"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Border Width="75" Height="15"
+                                    CornerRadius="8"
+                                    Background="{TemplateBinding Background}">
+                            <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+
+        </Grid>
+        <!-- Checked="RadioButton_Last_Call_Checked" Checked="RadioButton_Last_Week_Checked" Checked="RadioButton_Last_Month_Checked"-->
+        <RadioButton Content="Last Call" FontWeight="Bold" Foreground="#3DDDC2" Margin="200,10,107,0" Grid.Row="1" VerticalAlignment="Top" Height="26" Checked="RadioButton_Last_Call_Checked" />
+        <RadioButton Content="Last Week" FontWeight="Bold" Foreground="#3DDDC2" HorizontalAlignment="Left" Margin="338,10,0,0" Grid.Row="1" VerticalAlignment="Top" Height="26" Width="93" Grid.ColumnSpan="2" Checked="RadioButton_Last_Week_Checked" />
+        <RadioButton Content="Last Month" FontWeight="Bold" Foreground="#3DDDC2" HorizontalAlignment="Left" Margin="86,10,0,0" Grid.Row="1" VerticalAlignment="Top" Height="26" Width="93" Grid.Column="1" Checked="RadioButton_Last_Month_Checked" />
+
+        <StackPanel Grid.Row="2">
+            <TextBlock Text="My positive emotions vs negative ones"
+                Foreground="white"
+                FontSize="17"
+                FontWeight="Medium"
+                Margin="10"
+                HorizontalAlignment="Center"
+                FontFamily="Fonts/#Dosis"/>
+            <Grid Height="174">
+                <lvc:CartesianChart Foreground="White" Series="{Binding HappySadSeriesCollection}" LegendLocation="Left" Margin="29,9,38,21" RenderTransformOrigin="0.5,0.5">
+                    <lvc:CartesianChart.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform/>
+                            <SkewTransform AngleX="0"/>
+                            <RotateTransform/>
+                            <TranslateTransform X="0"/>
+                        </TransformGroup>
+                    </lvc:CartesianChart.RenderTransform>
+                    <lvc:CartesianChart.AxisX>
+                        <lvc:Axis Title="emotion" Labels="{Binding BarLabels}"></lvc:Axis>
+                    </lvc:CartesianChart.AxisX>
+                    <lvc:CartesianChart.AxisY>
+                        <lvc:Axis Title="percent" LabelFormatter="{Binding Formatter}"></lvc:Axis>
+                    </lvc:CartesianChart.AxisY>
+                </lvc:CartesianChart>
+            </Grid>
+
+        </StackPanel>
+
+        <StackPanel Grid.Row="3">
+            <TextBlock Text="Matching to others"
+                Foreground="white"
+                FontSize="17"
+                FontWeight="Medium"
+                Margin="10"
+                HorizontalAlignment="Center"
+                FontFamily="Fonts/#Dosis"/>
+            <Grid Height="174">
+                <lvc:CartesianChart Foreground="White" Series="{Binding MatchUserSeriesCollection}" LegendLocation="Left" Margin="26,7,35,31" RenderTransformOrigin="0.5,0.5">
+                    <lvc:CartesianChart.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform/>
+                            <SkewTransform AngleX="0"/>
+                            <RotateTransform/>
+                            <TranslateTransform X="0"/>
+                        </TransformGroup>
+                    </lvc:CartesianChart.RenderTransform>
+                    <lvc:CartesianChart.AxisX>
+                        <lvc:Axis Title="percent" Labels="{Binding BarLabels}"></lvc:Axis>
+                    </lvc:CartesianChart.AxisX>
+                    <lvc:CartesianChart.AxisY>
+                        <lvc:Axis Title="match" LabelFormatter="{Binding Formatter}"></lvc:Axis>
+                    </lvc:CartesianChart.AxisY>
+                </lvc:CartesianChart>
+            </Grid>
+
+        </StackPanel>
+
+    </Grid>
+</Page>

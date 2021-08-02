@@ -72,7 +72,7 @@ namespace FaceItGUI
 
         private void ShowStatistics(object sender, RoutedEventArgs e)
         {
-            login.Content = new StatisticsHome(login, this, userName);
+            login.Content = new statistics.StatisticsDashboard(login, this, userName);
         }
     }
 }
