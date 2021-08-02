@@ -8,6 +8,9 @@
 
   <ItemGroup>
     <None Remove="Images\facial-recognition-icon.jpg" />
+    <None Remove="Images\Statistics_1.jpg" />
+    <None Remove="Images\video_conference.jpg" />
+    <None Remove="Images\video_conference_2.jpg" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,6 +31,15 @@
 
   <ItemGroup>
     <Resource Include="Images\facial-recognition-icon.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Statistics_1.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\video_conference.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\video_conference_2.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>

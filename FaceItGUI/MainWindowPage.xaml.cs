@@ -27,6 +27,7 @@ namespace FaceItGUI
         private readonly int Port;
         private readonly string Ip;
         private static readonly HttpClient client = new HttpClient();
+        private const int userNameLength = 10;
 
         public MainWindowPage(LoginWindow loginWin, string userName)
         {
@@ -37,7 +38,14 @@ namespace FaceItGUI
             this.Ip = ConfigurationManager.AppSettings["HttpIp"];
             this.Port = Convert.ToInt32(ConfigurationManager.AppSettings["HttpPort"]);
             InitializeComponent();
-            welcometxt.Content = $"Welcome {userName}!";
+            if (userName.Length < userNameLength)
+            {
+                welcometxt.Text = $"Welcome {userName}!";
+            }
+            else
+            {
+                welcometxt.Text = $"Welcome!";
+            }
 
         }
 
@@ -73,6 +81,14 @@ namespace FaceItGUI
         private void ShowStatistics(object sender, RoutedEventArgs e)
         {
             login.Content = new StatisticsHome(login, this, userName);
+        }
+
+        private void Grid_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                this.login.DragMove();
+            }
         }
     }
 }

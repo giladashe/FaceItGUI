@@ -104,16 +104,15 @@
                 <DockPanel LastChildFill="True">
                     <Label FontSize="25" Margin="0,5" Content="Username : " Foreground="white" VerticalContentAlignment="Center"
 HorizontalContentAlignment="Left" FontFamily="Fonts/#Dosis"/>
-                    <!--<TextBox x:Name="txtUserName" Margin="0,5,0,5" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" FontSize="20" FontFamily="Fonts/#Dosis" />-->
                     <Border CornerRadius="5" BorderThickness="1" BorderBrush="white" Margin="0,5,0,5">
-                        <TextBox Background="Transparent" BorderThickness="0" Height="35" Name="txtUserName" Width="203" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" FontSize="20" FontFamily="Fonts/#Dosis" Foreground="White" Margin="3,0,0,0"/>
+                        <TextBox Background="Transparent" BorderThickness="0" Height="35" Name="txtUserName" Width="203" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" FontSize="20" FontFamily="Fonts/#Dosis" Foreground="White" Margin="3,0,0,0" CaretBrush="White"/>
                     </Border>
                 </DockPanel>
 
                 <DockPanel LastChildFill="True">
                     <Label FontSize="25"  Margin="2,5,0,5" Content="Password  : " Foreground="white" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" HorizontalAlignment="Left" FontFamily="Fonts/#Dosis"/>
                     <Border CornerRadius="5" BorderThickness="1" BorderBrush="white" Margin="0,5,0,5">
-                        <PasswordBox Background="Transparent" BorderThickness="0" Height="35" x:Name="txtPassword" Width="206" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" FontSize="20" FontFamily="Fonts/#Dosis" Foreground="White" Margin="3,0,0,0"/>
+                        <PasswordBox Background="Transparent" BorderThickness="0" Height="35" x:Name="txtPassword" Width="206" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" FontSize="20" FontFamily="Fonts/#Dosis" Foreground="White" Margin="3,0,0,0" CaretBrush="White"/>
                     </Border>
                 </DockPanel>
             </StackPanel>

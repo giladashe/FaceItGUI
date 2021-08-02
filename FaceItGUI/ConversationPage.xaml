@@ -3,34 +3,169 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:Microsoft_Windows_Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero"
       xmlns:local="clr-namespace:FaceItGUI"
       mc:Ignorable="d" 
       d:DesignHeight="500" d:DesignWidth="900"
-      Title="FaceIt">
-
+      Title="FaceIt"
+      >
+    <Page.Resources>
+        <Style x:Key="scroll_thumb_style" TargetType="{x:Type Thumb}">
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="IsTabStop" Value="false"/>
+            <Setter Property="Focusable" Value="false"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Thumb">
+                        <Rectangle Width="13" Fill="#7D7D7D" RadiusX="5" RadiusY="5">
+                        </Rectangle>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <ControlTemplate x:Key="scroll_background" TargetType="{x:Type RepeatButton}">
+            <Border Background="Transparent">
+            </Border>
+        </ControlTemplate>
+        <Style x:Key="myScroll" TargetType="ScrollBar">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid Width="15">
+                            <Border Width="13" HorizontalAlignment="Center" CornerRadius="5" Background="#33555555">
+                            </Border>
+                            <Track HorizontalAlignment="Center" Name="PART_Track" Width="{TemplateBinding Width}" Maximum="{TemplateBinding Maximum}" Minimum="{TemplateBinding Minimum}"
+                                    Value="{TemplateBinding Value}"  IsDirectionReversed="true">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Template="{StaticResource scroll_background}" Command="ScrollBar.LineUpCommand"  />
+                                </Track.DecreaseRepeatButton>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Template="{StaticResource scroll_background}" Command="ScrollBar.LineDownCommand" />
+                                </Track.IncreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb Style="{StaticResource scroll_thumb_style}" >
+                                    </Thumb>
+                                </Track.Thumb>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="5*"/>
             <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="2*"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="7*"/>
+            <RowDefinition Height="4*"/>
         </Grid.RowDefinitions>
-        <Border Grid.Column ="1" Background="#2f5cb6">
+        <Grid Background="#0F0F2D" Grid.Row="0"
+            Grid.ColumnSpan="2" MouseDown="Grid_MouseDown">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <!--<Button Content="Back to menu"
+                Foreground="white"
+                FontSize="14"
+                FontWeight="Medium"
+                Margin="200,10,0,0"  x:Name="stopButton" Click="StopButton_Click" >
+
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="TextElement.FontFamily" Value="Fonts/#Dosis"/>
+                        <Setter Property="Background" Value="#FE6584"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#FF4C70"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Border Width="100" Height="25"
+                                    CornerRadius="12"
+                                    Background="{TemplateBinding Background}">
+                            <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>-->
+            <Button Content="Back to menu"
+                Foreground="white"
+                FontSize="14"
+                FontWeight="Medium"
+                Margin="0,0,10,0"
+                Grid.Column="12"
+                Grid.ColumnSpan="2" x:Name="stopButton" Click="StopButton_Click">
+
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="TextElement.FontFamily" Value="Fonts/#Dosis"/>
+                        <Setter Property="Background" Value="#FE6584"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#FF4C70"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Border Width="100" Height="25"
+                                    CornerRadius="8"
+                                    Background="{TemplateBinding Background}">
+                            <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+
+        </Grid>
+        <Border Grid.Row="1" Grid.Column ="1" Background="#181735">
             <StackPanel>
-                <Button x:Name="checkMatchBtn" Click="CheckMatchOnClick" Content="Finished snipping? Check matching!" Visibility="Hidden" FontSize="18" Background="Khaki"/>
-                <TextBlock x:Name="matchText" HorizontalAlignment="Center" Foreground="White" FontSize="25" Text=""/>
-                <TextBlock Width="300" Margin="0,100,0,0"  x:Name="errorTxt" HorizontalAlignment="Center" TextAlignment="Center" Foreground="red" FontSize="30" />
+                <!--<Button x:Name="checkMatchBtn" Click="CheckMatchOnClick" Content="Finished snipping? Check matching!" Visibility="Hidden" FontSize="18" Background="Khaki"/>-->
+                <!--<Button x:Name="stopButton" Click="StopButton_Click" Width="230" Margin="0,30,0,0" HorizontalAlignment="center" FontSize="20" Background="OrangeRed">
+                Stop conversation
+            </Button>-->
+
+                <TextBlock x:Name="checking" HorizontalAlignment="Center" Foreground="White" FontSize="22" Text="Checking..." FontFamily="Fonts/#Dosis" Margin="0,30,0,0" Visibility="Hidden"/>
+                <TextBlock x:Name="matchText" HorizontalAlignment="Left" Foreground="White" FontSize="25" Text="" FontFamily="Fonts/#Dosis" Margin="0,30,0,0"/>
+                <TextBlock Width="300" Margin="0,80,0,0"  x:Name="errorTxt" HorizontalAlignment="Center" TextAlignment="Center" Foreground="#ff0033" FontSize="30" FontFamily="Fonts/#Dosis" TextWrapping="Wrap"
+ Text=""/>
             </StackPanel>
         </Border>
-        <Border Grid.Column ="0" Background="#1f3d7a"/>
-        <Border x:Name="namesListBorder" Grid.Row="1" Grid.ColumnSpan="2" Background="#152951" >
-            <ListBox x:Name="namesList" Background="#152951" HorizontalContentAlignment="Center">
+        <Border Grid.Row="1" Grid.Column ="0" Background="#181735"/>
+        <Border x:Name="namesListBorder" Grid.Row="2" Grid.ColumnSpan="2" Background="#181735" >
+
+            <ListBox x:Name="namesList" Background="#181735" HorizontalContentAlignment="Center" BorderBrush="Transparent">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Border Background="#2f5cb6">
-                            <TextBlock FontSize="30" TextAlignment="Center">
+                        <Border Background="#181735">
+                            <TextBlock Foreground="White" FontSize="30" TextAlignment="Center" FontFamily="Fonts/#Dosis">
                                 <TextBlock.Text>
                                     <MultiBinding StringFormat="{}{0} - {1}">
                                         <Binding Path="Name" />
@@ -41,24 +176,152 @@
                         </Border>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
+                <ListBox.Resources>
+                    <Style TargetType="ScrollBar" BasedOn="{StaticResource myScroll}">
+                    </Style>
+                </ListBox.Resources>
             </ListBox>
         </Border>
-        <StackPanel Grid.Column="0" Margin="40,20,0,0" VerticalAlignment="Center">
-            <TextBlock HorizontalAlignment="Center" Foreground="White" FontSize="30" Text="Welcome To FaceIt"/>
-            <TextBlock x:Name="snipMeTxt" Margin="10" HorizontalAlignment="Center" Foreground="White" FontSize="23" Text="Please snip yourself!"/>
-            <Button x:Name="meButton" Click="MyButton_Click" Width="230" FontSize="20" Background="GreenYellow">
-                snip my video
-            </Button>
-            <TextBlock x:Name="othersTxt" HorizontalAlignment="Center" Foreground="White" FontSize="25" Text="Want to snip others?" Visibility="Hidden"/>
-            <TextBox  x:Name="nameBox" Visibility="Hidden"/>
 
-            <Button x:Name="othersButton" Click="MyButton_Click" Width="230" FontSize="20" Background="GreenYellow" Visibility="Hidden">
+        <StackPanel Grid.Row="1" Grid.Column="0" Margin="40,20,0,0" VerticalAlignment="Center">
+            <TextBlock HorizontalAlignment="Center" Foreground="White" FontSize="30" Text="Welcome To FaceIt" FontFamily="Fonts/#Dosis" />
+            <TextBlock x:Name="snipMeTxt" Margin="10" HorizontalAlignment="Center" Foreground="White" FontSize="23" Text="Please snip yourself!" FontFamily="Fonts/#Dosis" />
+            <!--<Button x:Name="meButton" Click="MyButton_Click" Width="230" FontSize="20" Background="GreenYellow" FontFamily="Fonts/#Dosis">
+                snip my video
+            </Button>-->
+            <Button Content="Snip my video"
+                Foreground="white"
+                FontSize="14"
+                FontWeight="Medium"
+                Margin="0,0,10,0"  x:Name="meButton" Click="MyButton_Click" >
+
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="TextElement.FontFamily" Value="Fonts/#Dosis"/>
+                        <Setter Property="Background" Value="#FE6584"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#FF4C70"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Border Width="100" Height="25"
+                                    CornerRadius="12"
+                                    Background="{TemplateBinding Background}">
+                            <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+            <DockPanel LastChildFill="True">
+                <Label x:Name="othersTxt" FontSize="20" Margin="0,5" Content="Want to snip others?"  Foreground="white" VerticalContentAlignment="Center"
+HorizontalContentAlignment="Left" FontFamily="Fonts/#Dosis" Visibility="Hidden"/>
+                <Border x:Name="borderNameBox" CornerRadius="5" BorderThickness="1" BorderBrush="white" Margin="0,5,0,5" 
+                        Visibility="Hidden">
+                    <TextBox x:Name="nameBox" Background="Transparent" BorderThickness="0" Height="35" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" FontSize="20" FontFamily="Fonts/#Dosis" Foreground="White" Margin="3,0,0,0" CaretBrush="White" Width="200"/>
+                </Border>
+                <Button x:Name="othersButton" Content="Write N Snip!"
+                Foreground="white"
+                FontSize="14"
+                FontWeight="Medium"
+                Margin="0,0,10,0"  Click="MyButton_Click" Visibility="Hidden">
+
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="TextElement.FontFamily" Value="Fonts/#Dosis"/>
+                            <Setter Property="Background" Value="#FE6584"/>
+                            <Setter Property="Cursor" Value="Hand"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#FF4C70"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Width="100" Height="25"
+                                    CornerRadius="12"
+                                    Background="{TemplateBinding Background}">
+                                <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
+            </DockPanel>
+            <!--<TextBlock x:Name="othersTxt" HorizontalAlignment="Center" Foreground="White" FontSize="25" Text="Want to snip others?" Visibility="Hidden"/>
+            <TextBox  x:Name="nameBox" Visibility="Hidden"/>-->
+            <!--<Button x:Name="othersButton" Click="MyButton_Click" Width="230" FontSize="20" Background="GreenYellow" Visibility="Hidden">
                 press after writing name
+            </Button>-->
+            <!--<Button x:Name="checkMatchBtn" Click="CheckMatchOnClick" Width="230" Margin="0,30,0,0" HorizontalAlignment="center" FontSize="20" Background="OrangeRed" Content="Finished snipping? Check matching!" />-->
+            <Button x:Name="checkMatchBtn" Content="Finished? Check matching!"
+                Foreground="white"
+                FontSize="14"
+                FontWeight="Medium"
+                Margin="0,40,10,0"  Click="CheckMatchOnClick" Visibility="Hidden">
+
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="TextElement.FontFamily" Value="Fonts/#Dosis"/>
+                        <Setter Property="Background" Value="#39385D"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#3A3952"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Border Width="190" Height="25"
+                                    CornerRadius="12"
+                                    Background="{TemplateBinding Background}">
+                            <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Button.Template>
             </Button>
-            <Button x:Name="stopButton" Click="StopButton_Click" Width="230" Margin="0,30,0,0" HorizontalAlignment="center" FontSize="20" Background="OrangeRed">
+
+            <!--<Button x:Name="stopButton" Click="StopButton_Click" Width="230" Margin="0,30,0,0" HorizontalAlignment="center" FontSize="20" Background="OrangeRed">
                 Stop conversation
-            </Button>
+            </Button>-->
+            <!--<Button x:Name="checkMatchBtn" Click="CheckMatchOnClick" Content="Finished snipping? Check matching!" Visibility="Hidden" FontSize="18" Background="Khaki"/>-->
         </StackPanel>
+        <Grid Grid.Row="2" Grid.Column="1" Margin="100, -65, -610, 85">
+            <Grid.RenderTransform>
+                <RotateTransform Angle="50"/>
+            </Grid.RenderTransform>
+            <StackPanel  >
+                <Border Width="700"
+                            Height="35"
+                            Background="#3DDDC2"
+                            Margin="150,0,0,0"
+                            CornerRadius="20"/>
+
+                <Border Width="700"
+                            Height="35"
+                            Background="#FC6586"
+                            Margin="0,15,0,0"
+                            CornerRadius="20"/>
+
+                <Border Width="700"
+                            Height="35"
+                            Background="#383660"
+                            Margin="75,15,0,0"
+                            CornerRadius="20"/>
+
+            </StackPanel>
+        </Grid>
 
 
     </Grid>
