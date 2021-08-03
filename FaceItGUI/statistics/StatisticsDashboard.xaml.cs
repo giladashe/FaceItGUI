@@ -7,6 +7,14 @@ using LiveCharts.Wpf;
 using System.Configuration;
 using Newtonsoft.Json.Linq;
 using System.Net;
+using LiveCharts.Defaults;
+using System.Collections.Generic;
+using Newtonsoft.Json;
+using System.Text;
+using System.Drawing;
+using System.Windows.Forms;
+using System.Windows.Interop;
+using System.Windows.Media;
 
 namespace FaceItGUI.statistics
 {
@@ -29,6 +37,14 @@ namespace FaceItGUI.statistics
         private string positivePercents = "0"; // HappySad
         private string negativePercents = "0";
         private string userMatchPercent = "0"; // UserMatch
+        private string othersPositivePercent = "0"; // OthersPositive
+        private string happyPercents = "0"; // TotalEmotions
+        private string neutralPercents = "0";
+        private string sadPercents = "0";
+        private string surprisePercents = "0";
+        private string angryPercents = "0";
+        private string disgustPercents = "0";
+        private string fearPercents = "0";
 
 
         public StatisticsDashboard(LoginWindow loginWindow, MainWindowPage main, string userName)
@@ -67,50 +83,172 @@ namespace FaceItGUI.statistics
                 }
             };
 
+            OthersPositiveSeriesCollection = new SeriesCollection
+            {
+                new ColumnSeries
+                {
+                    Title = "positive",
+                    Values = new ChartValues<double> { 0 }
+                }
+            };
+
+            TotalEmotionsSeriesCollection = new SeriesCollection
+            {
+                new PieSeries
+                {
+                    Title = "happy",
+                    Values = new ChartValues<ObservableValue> {new ObservableValue(0) },
+                    DataLabels = true
+                } ,
+                new PieSeries
+                {
+                    Title = "neutral",
+                    Values = new ChartValues<ObservableValue> {new ObservableValue(0) },
+                    DataLabels = true
+                } ,
+                new PieSeries
+                {
+                    Title = "sad",
+                    Values = new ChartValues<ObservableValue> {new ObservableValue(0) },
+                    DataLabels = true
+                } ,
+                new PieSeries
+                {
+                    Title = "surprise",
+                    Values = new ChartValues<ObservableValue> {new ObservableValue(0) },
+                    DataLabels = true
+                } ,
+                new PieSeries
+                {
+                    Title = "angry",
+                    Values = new ChartValues<ObservableValue> {new ObservableValue(0) },
+                    DataLabels = true
+                } ,
+                new PieSeries
+                {
+                    Title = "disgust",
+                    Values = new ChartValues<ObservableValue> {new ObservableValue(0) },
+                    DataLabels = true
+                } ,
+                new PieSeries
+                {
+                    Title = "fear",
+                    Values = new ChartValues<ObservableValue> {new ObservableValue(0) },
+                    DataLabels = true
+                }
+            };
 
             BarLabels = new[] {""};
             Formatter = value => value.ToString("N");
 
             DataContext = this;
 
+            //System.Windows.Point topLeft = primary_grid.PointToScreen(new System.Windows.Point(0, 0));
+            double x = this.parentWindow.Left; //System.Windows.Point
+            double y = this.parentWindow.Top;
+            var pass = 1;
+
+            //System.Windows.Forms.Screen r = System.Windows.Forms.Screen.FromHandle(new WindowInteropHelper(parentWindow).Handle);
+            /*            double Left = SystemParameters.VirtualScreenLeft;
+                        double Top = SystemParameters.VirtualScreenTop;
+                        double ScreenWidth = SystemParameters.VirtualScreenWidth;
+                        double ScreenHeight = SystemParameters.VirtualScreenHeight;
+            */
+            //var bounds = Screen.PrimaryScreen.Bounds;
+            //lastCallButton.IsChecked = true;
+
         }
 
 
-        private void Exit(object sender, RoutedEventArgs e)
+        private void BachToMenu(object sender, RoutedEventArgs e)
         {
-            parentWindow.Content = this.loginContent;
+            this.parentWindow.Content = this.mainWinPage;
         }
-
-        /*private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            string text = (e.AddedItems[0] as ComboBoxItem).Content as string;
-            if (text == "Last Call")
-            {
-                time = "last_call";
-            }
-            else if (text == "Last Week")
-            {
-                time = "last_week";
-            }
-            else if (text == "Last Month")
-            {
-                time = "last_month";
-            }
-        }*/
-
 
         public SeriesCollection HappySadSeriesCollection { get; set; }
 
         public SeriesCollection MatchUserSeriesCollection { get; set; }
 
+        public SeriesCollection OthersPositiveSeriesCollection { get; set; }
+
+        public SeriesCollection TotalEmotionsSeriesCollection { get; set; }
+
+
         public string[] BarLabels { get; set; }
 
         public Func<double, string> Formatter { get; set; }
+
+        public async void SendEmail() //object sender, RoutedEventArgs e
+        {
+            //string userName = "a";
+            //var myFrame = SnippingTool.Snip();
+            /*            double Left = SystemParameters.VirtualScreenLeft;
+                        double Top = SystemParameters.VirtualScreenTop;
+                        double ScreenWidth = SystemParameters.VirtualScreenWidth;
+                        double ScreenHeight = SystemParameters.VirtualScreenHeight;
+            */
+            
+            System.Drawing.Image image = SnippingTool.FromRectangle(new System.Drawing.Rectangle(Convert.ToInt32(this.parentWindow.Left), Convert.ToInt32(this.parentWindow.Top), Convert.ToInt32(this.parentWindow.Width), Convert.ToInt32(this.parentWindow.Height)));
+            Byte[] imageBytes = ConversationPage.ImageToByte(image);
+            var values = new Dictionary<string, string>
+            {
+                { "userName", userName },
+                { "image", Convert.ToBase64String(imageBytes) },
+                { "time", time }
+            };
+            string json = JsonConvert.SerializeObject(values, Formatting.Indented);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            string httpRegisterPost = "http://" + this.Ip + ":" + this.Port + "/statistics/email";
+            try
+            {
+                var response = await client.PostAsync(httpRegisterPost, content);
+                var responseString = await response.Content.ReadAsStringAsync();
+                await Dispatcher.BeginInvoke(new Action(delegate ()
+                {
+                    switch (response.StatusCode)
+                    {
+                        case HttpStatusCode.OK:
+                            //BackToLogin();
+                            break;
+                        case HttpStatusCode.BadRequest:
+                            if (responseString == "userName exists")
+                            {
+                                errorTxt.Text = "This userName already exists in the system";
+                            }
+                            else if (responseString == "mail exists")
+                            {
+                                errorTxt.Text = "This mail already exists in the system";
+                            }
+                            else if (responseString == "db failure")
+                            {
+                                errorTxt.Text = "Failure with connection to DB";
+                            }
+                            else
+                            {
+                                errorTxt.Text = responseString;
+                            }
+                            break;
+                        default:
+                            errorTxt.Text = "Problem with connection to server";
+                            break;
+                    }
+                }));
+            }
+            catch
+            {
+                await Dispatcher.BeginInvoke(new Action(delegate ()
+                {
+                    errorTxt.Text = "Problem with connection to server";
+                }));
+            }
+        }
+
 
         private void RadioButton_Last_Call_Checked(object sender, RoutedEventArgs e)
         {
             time = "last_call";
             UpdateCharts();
+            SendEmail();
         }
 
         private void RadioButton_Last_Week_Checked(object sender, RoutedEventArgs e)
@@ -129,6 +267,8 @@ namespace FaceItGUI.statistics
         {
             getHappySad();
             getUserMatch();
+            getOthersPositive();
+            getTotalEmotions();
         }
 
         private async void getHappySad()  
@@ -138,27 +278,28 @@ namespace FaceItGUI.statistics
             {
                 var response = await client.GetAsync(getHappySadhRequest);
                 var responseString = await response.Content.ReadAsStringAsync();
-                JObject json = JObject.Parse(responseString);
-                positivePercents = json["positive_percents"].ToString();
-                negativePercents = json["negative_percents"].ToString();
 
                 switch (response.StatusCode)
                 {
                     case HttpStatusCode.OK:
+                        errorTxt.Text = "";
+                        JObject json = JObject.Parse(responseString);
+                        positivePercents = json["positive_percents"].ToString();
+                        negativePercents = json["negative_percents"].ToString();
                         break;
                     case HttpStatusCode.BadRequest:
-                        //errorTxt.Content = "DB connection problem"; TODO
+                        errorTxt.Text = "DB connection problem";
                         break;
                     default:
-                        //errorTxt.Content = "Problem with connection to server";
+                        errorTxt.Text = "Problem with connection to server";
                         break;
                 }
             }
             catch
             {
-                // errorTxt.Content = "Problem with connection to server";
+                errorTxt.Text = "Problem with connection to server";
+                return;
             }
-
             HappySadSeriesCollection.Clear();
             HappySadSeriesCollection.Add(new ColumnSeries
             {
@@ -181,26 +322,27 @@ namespace FaceItGUI.statistics
             {
                 var response = await client.GetAsync(getUserMatchRequest);
                 var responseString = await response.Content.ReadAsStringAsync();
-                JObject json = JObject.Parse(responseString);
-                userMatchPercent = json["percents"].ToString();
 
                 switch (response.StatusCode)
                 {
                     case HttpStatusCode.OK:
+                        errorTxt.Text = "";
+                        JObject json = JObject.Parse(responseString);
+                        userMatchPercent = json["percents"].ToString();
                         break;
                     case HttpStatusCode.BadRequest:
-                        //errorTxt.Content = "DB connection problem"; TODO
+                        errorTxt.Text = "DB connection problem"; 
                         break;
                     default:
-                        //errorTxt.Content = "Problem with connection to server";
+                        errorTxt.Text = "Problem with connection to server";
                         break;
                 }
             }
             catch
             {
-                // errorTxt.Content = "Problem with connection to server";
+                errorTxt.Text = "Problem with connection to server";
+                return;
             }
-
             MatchUserSeriesCollection.Clear();
             MatchUserSeriesCollection.Add(new ColumnSeries
             {
@@ -208,6 +350,122 @@ namespace FaceItGUI.statistics
                 Values = new ChartValues<double> { Convert.ToDouble(userMatchPercent) } //negativePercents
             });
 
+        }
+
+        private async void getOthersPositive()
+        {
+            string getOthersPositiveRequest = "http://" + this.Ip + ":" + this.Port + "/statistics/others?user_name=" + userName + "&time=" + time;
+            try
+            {
+                var response = await client.GetAsync(getOthersPositiveRequest);
+                var responseString = await response.Content.ReadAsStringAsync();
+
+                switch (response.StatusCode)
+                {
+                    case HttpStatusCode.OK:
+                        errorTxt.Text = "";
+                        JObject json = JObject.Parse(responseString);
+                        othersPositivePercent = json["percents"].ToString();
+                        break;
+                    case HttpStatusCode.BadRequest:
+                        errorTxt.Text = "DB connection problem"; 
+                        break;
+                    default:
+                        errorTxt.Text = "Problem with connection to server";
+                        break;
+                }
+            }
+            catch
+            {
+                errorTxt.Text = "Problem with connection to server";
+                return;
+            }
+            OthersPositiveSeriesCollection.Clear();
+            OthersPositiveSeriesCollection.Add(new ColumnSeries
+            {
+                Title = "postive",
+                Values = new ChartValues<double> { Convert.ToDouble(othersPositivePercent) } 
+            });
+
+        }
+
+        private async void getTotalEmotions()
+        {
+            string getTotalEmotionsRequest = "http://" + this.Ip + ":" + this.Port + "/statistics/user/emotions?user_name=" + userName + "&time=" + time;
+            try
+            {
+                var response = await client.GetAsync(getTotalEmotionsRequest);
+                var responseString = await response.Content.ReadAsStringAsync();
+
+                switch (response.StatusCode)
+                {
+                    case HttpStatusCode.OK:
+                        errorTxt.Text = "";
+                        JObject json = JObject.Parse(responseString);
+                        happyPercents = json["happy_percents"].ToString();
+                        neutralPercents = json["neutral_percents"].ToString();
+                        sadPercents = json["sad_percents"].ToString();
+                        surprisePercents = json["surprise_percents"].ToString();
+                        angryPercents = json["angry_percents"].ToString();
+                        disgustPercents = json["disgust_percents"].ToString();
+                        fearPercents = json["fear_percents"].ToString();
+                        break;
+                    case HttpStatusCode.BadRequest:
+                        errorTxt.Text = "DB connection problem"; 
+                        break;
+                    default:
+                        errorTxt.Text = "Problem with connection to server";
+                        break;
+                }
+            }
+            catch
+            {
+                errorTxt.Text = "Problem with connection to server";
+                return;
+            }
+            TotalEmotionsSeriesCollection.Clear();
+            TotalEmotionsSeriesCollection.Add(new PieSeries
+            {
+                Title = "happy",
+                Values = new ChartValues<ObservableValue> { new ObservableValue(Convert.ToDouble(happyPercents)) },
+                DataLabels = true
+            });
+            TotalEmotionsSeriesCollection.Add(new PieSeries
+            {
+                Title = "neutral",
+                Values = new ChartValues<ObservableValue> { new ObservableValue(Convert.ToDouble(neutralPercents)) },
+                DataLabels = true
+            });
+            TotalEmotionsSeriesCollection.Add(new PieSeries
+            {
+                Title = "sad",
+                Values = new ChartValues<ObservableValue> { new ObservableValue(Convert.ToDouble(sadPercents)) },
+                DataLabels = true
+            });
+            TotalEmotionsSeriesCollection.Add(new PieSeries
+            {
+                Title = "surprise",
+                Values = new ChartValues<ObservableValue> { new ObservableValue(Convert.ToDouble(surprisePercents)) },
+                DataLabels = true
+            });
+            TotalEmotionsSeriesCollection.Add(new PieSeries
+            {
+                Title = "angry",
+                Values = new ChartValues<ObservableValue> { new ObservableValue(Convert.ToDouble(angryPercents)) },
+                DataLabels = true
+            });
+            TotalEmotionsSeriesCollection.Add(new PieSeries
+            {
+                Title = "disgust",
+                Values = new ChartValues<ObservableValue> { new ObservableValue(Convert.ToDouble(disgustPercents)) },
+                DataLabels = true
+            });
+            TotalEmotionsSeriesCollection.Add(new PieSeries
+            {
+                Title = "fear",
+                Values = new ChartValues<ObservableValue> { new ObservableValue(Convert.ToDouble(fearPercents)) },
+                DataLabels = true
+            });
         }
 
     }

@@ -10,55 +10,20 @@
       Title="StatisticsDashboard"
       Background="#181735">
 
-    <Grid>
+    <Grid x:Name="primary_grid">
 
         <Grid.RowDefinitions>
             <RowDefinition Height="20"/>
             <RowDefinition Height="30"/>
             <RowDefinition/>
             <RowDefinition/>
+            <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
-
-        <!--TextBlock Grid.Row="1" Grid.ColumnSpan="2"
-                       Text="FaceIt"
-                       Foreground="White"
-                       FontSize="20"
-                       FontWeight="Medium"
-                       VerticalAlignment="center"
-                       HorizontalAlignment="Center"
-                       FontFamily="Fonts/#Dosis"
-                       Margin="10,0,0,0"></-->
-
-        <!--ComboBox Grid.Row="2"
-                  Name="comboBoxTime"
-                  IsEditable="True"
-                  FontSize="20" FontWeight="Medium" FontFamily="Fonts/#Dosis"
-                  VerticalContentAlignment="Center" HorizontalAlignment="Left"
-                  IsReadOnly="True"
-                  Text="Select time"
-                  SelectionChanged="ComboBox_SelectionChanged"
-                  Width="114" Margin="8,65,0,94"
-                  >
-            <ComboBoxItem Content="Last Call" FontSize="15"/>
-            <ComboBoxItem Content="Last Week" FontSize="15"/>
-            <ComboBoxItem Content="Last Month" FontSize="15"/>
-
-            <ComboBox.Template>
-                <ControlTemplate TargetType="ComboBox">
-                    <Border Width="75" Height="15"
-                                    CornerRadius="8"
-                                    Background="{TemplateBinding Background}">
-                        <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                    </Border>
-                </ControlTemplate>
-            </>
-
-        </ComboBox-->
 
 
         <Grid Background="#0F0F2D"
@@ -81,13 +46,14 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
-            <Button Content="Exit"
+            <Button Content="Bach To Menu"
                 Foreground="white"
-                FontSize="12"
+                FontSize="14"
                 FontWeight="Medium"
                 Margin="0,0,10,0"
                 Grid.Column="12"
-                Grid.ColumnSpan="2">
+                Grid.ColumnSpan="2"
+                Click="BachToMenu">
 
                 <Button.Style>
                     <Style TargetType="Button">
@@ -104,7 +70,7 @@
 
                 <Button.Template>
                     <ControlTemplate TargetType="Button">
-                        <Border Width="75" Height="15"
+                        <Border Width="100" Height="15"
                                     CornerRadius="8"
                                     Background="{TemplateBinding Background}">
                             <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
@@ -114,19 +80,20 @@
             </Button>
 
         </Grid>
-        <!-- Checked="RadioButton_Last_Call_Checked" Checked="RadioButton_Last_Week_Checked" Checked="RadioButton_Last_Month_Checked"-->
-        <RadioButton Content="Last Call" FontWeight="Bold" Foreground="#3DDDC2" Margin="200,10,107,0" Grid.Row="1" VerticalAlignment="Top" Height="26" Checked="RadioButton_Last_Call_Checked" />
+        <RadioButton x:Name="dummy_button" Content="dummy" FontWeight="Bold" Foreground="#3DDDC2" Grid.Row="2" VerticalAlignment="Top" Height="26" HorizontalAlignment="Left" Width="93" />
+        <RadioButton x:Name="lastCallButton" Content="Last Call" FontWeight="Bold" Foreground="#3DDDC2" Margin="230,10,0,0" Grid.Row="1" VerticalAlignment="Top" Height="26" Checked="RadioButton_Last_Call_Checked" HorizontalAlignment="Left" Grid.RowSpan="2" Width="93" />
         <RadioButton Content="Last Week" FontWeight="Bold" Foreground="#3DDDC2" HorizontalAlignment="Left" Margin="338,10,0,0" Grid.Row="1" VerticalAlignment="Top" Height="26" Width="93" Grid.ColumnSpan="2" Checked="RadioButton_Last_Week_Checked" />
-        <RadioButton Content="Last Month" FontWeight="Bold" Foreground="#3DDDC2" HorizontalAlignment="Left" Margin="86,10,0,0" Grid.Row="1" VerticalAlignment="Top" Height="26" Width="93" Grid.Column="1" Checked="RadioButton_Last_Month_Checked" />
+        <RadioButton Content="Last Month" FontWeight="Bold" Foreground="#3DDDC2" HorizontalAlignment="Left" Margin="30,10,0,0" Grid.Row="1" VerticalAlignment="Top" Height="26" Width="93" Grid.Column="1" Checked="RadioButton_Last_Month_Checked" Grid.RowSpan="2" />
 
         <StackPanel Grid.Row="2">
-            <TextBlock Text="My positive emotions vs negative ones"
+            <TextBlock Text="My positive emotions vs negative"
                 Foreground="white"
                 FontSize="17"
                 FontWeight="Medium"
                 Margin="10"
-                HorizontalAlignment="Center"
-                FontFamily="Fonts/#Dosis"/>
+                HorizontalAlignment="Right"
+                FontFamily="Fonts/#Dosis" RenderTransformOrigin="0.72,0.431" Width="300"
+                />
             <Grid Height="174">
                 <lvc:CartesianChart Foreground="White" Series="{Binding HappySadSeriesCollection}" LegendLocation="Left" Margin="29,9,38,21" RenderTransformOrigin="0.5,0.5">
                     <lvc:CartesianChart.RenderTransform>
@@ -154,8 +121,8 @@
                 FontSize="17"
                 FontWeight="Medium"
                 Margin="10"
-                HorizontalAlignment="Center"
-                FontFamily="Fonts/#Dosis"/>
+                FontFamily="Fonts/#Dosis"
+                HorizontalAlignment="Right" Width="240"/>
             <Grid Height="174">
                 <lvc:CartesianChart Foreground="White" Series="{Binding MatchUserSeriesCollection}" LegendLocation="Left" Margin="26,7,35,31" RenderTransformOrigin="0.5,0.5">
                     <lvc:CartesianChart.RenderTransform>
@@ -176,6 +143,63 @@
             </Grid>
 
         </StackPanel>
+
+        <StackPanel Grid.Row="2" Grid.Column="1">
+            <TextBlock
+                Text="Others positive"
+                Foreground="white"
+                FontSize="17"
+                FontWeight="Medium"
+                Margin="10"
+                HorizontalAlignment="Right"
+                FontFamily="Fonts/#Dosis" Width="230"/>
+            <Grid Height="174">
+                <lvc:CartesianChart Foreground="White" Series="{Binding OthersPositiveSeriesCollection}" LegendLocation="Left" Margin="26,7,35,31" RenderTransformOrigin="0.5,0.5">
+                    <lvc:CartesianChart.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform/>
+                            <SkewTransform AngleX="0"/>
+                            <RotateTransform/>
+                            <TranslateTransform X="0"/>
+                        </TransformGroup>
+                    </lvc:CartesianChart.RenderTransform>
+                    <lvc:CartesianChart.AxisX>
+                        <lvc:Axis Title="percent" Labels="{Binding BarLabels}"></lvc:Axis>
+                    </lvc:CartesianChart.AxisX>
+                    <lvc:CartesianChart.AxisY>
+                        <lvc:Axis Title="match" LabelFormatter="{Binding Formatter}"></lvc:Axis>
+                    </lvc:CartesianChart.AxisY>
+                </lvc:CartesianChart>
+            </Grid>
+
+
+        </StackPanel>
+
+        <StackPanel Grid.Row="3" Grid.Column="1">
+            <TextBlock Text="My total emotions in percents"
+                Foreground="white"
+                FontSize="17"
+                FontWeight="Medium"
+                Margin="10"
+                HorizontalAlignment="Center"
+                FontFamily="Fonts/#Dosis"/>
+            <Grid Height="174">
+                <lvc:PieChart Foreground="White" Series="{Binding TotalEmotionsSeriesCollection}" LegendLocation="Left" Hoverable="True" InnerRadius="10" Margin="26,7,135,25" RenderTransformOrigin="0.5,0.5">
+                </lvc:PieChart>
+            </Grid>
+
+        </StackPanel>
+
+        <TextBlock Grid.Row="4" Grid.ColumnSpan="2"
+                x:Name="errorTxt"
+                Text=""
+                Foreground="Red"
+                FontSize="15"
+                FontWeight="Medium"
+                Margin="5"
+                HorizontalAlignment="Center"
+                FontFamily="Fonts/#Dosis"/>
+
 
     </Grid>
 </Page>
