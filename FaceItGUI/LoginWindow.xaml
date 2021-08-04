@@ -103,7 +103,7 @@
 
                 <DockPanel LastChildFill="True">
                     <Label FontSize="25" Margin="0,5" Content="Username : " Foreground="white" VerticalContentAlignment="Center"
-HorizontalContentAlignment="Left" FontFamily="Fonts/#Dosis"/>
+                    HorizontalContentAlignment="Left" FontFamily="Fonts/#Dosis"/>
                     <Border CornerRadius="5" BorderThickness="1" BorderBrush="white" Margin="0,5,0,5">
                         <TextBox Background="Transparent" BorderThickness="0" Height="35" Name="txtUserName" Width="203" VerticalContentAlignment="Center" HorizontalContentAlignment="Left" FontSize="20" FontFamily="Fonts/#Dosis" Foreground="White" Margin="3,0,0,0" CaretBrush="White"/>
                     </Border>
@@ -180,7 +180,7 @@ HorizontalContentAlignment="Left" FontFamily="Fonts/#Dosis"/>
 
             </StackPanel>
             <Label x:Name="errorTxt" FontSize="20" Margin="0,5,5,10" Content=""
-HorizontalContentAlignment="center"  VerticalContentAlignment="Center" Foreground="Red"  />
+            HorizontalContentAlignment="center"  VerticalContentAlignment="Center" Foreground="Red"  />
         </StackPanel>
 
         <Grid Grid.Column="1"

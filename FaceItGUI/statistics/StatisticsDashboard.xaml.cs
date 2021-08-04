@@ -143,11 +143,11 @@ namespace FaceItGUI.statistics
 
             DataContext = this;
 
-            //System.Windows.Point topLeft = primary_grid.PointToScreen(new System.Windows.Point(0, 0));
+/*            System.Windows.Point topLeft = dummy_button.PointToScreen(new System.Windows.Point(0, 0));
             double x = this.parentWindow.Left; //System.Windows.Point
             double y = this.parentWindow.Top;
             var pass = 1;
-
+*/
             //System.Windows.Forms.Screen r = System.Windows.Forms.Screen.FromHandle(new WindowInteropHelper(parentWindow).Handle);
             /*            double Left = SystemParameters.VirtualScreenLeft;
                         double Top = SystemParameters.VirtualScreenTop;
@@ -178,77 +178,11 @@ namespace FaceItGUI.statistics
 
         public Func<double, string> Formatter { get; set; }
 
-        public async void SendEmail() //object sender, RoutedEventArgs e
-        {
-            //string userName = "a";
-            //var myFrame = SnippingTool.Snip();
-            /*            double Left = SystemParameters.VirtualScreenLeft;
-                        double Top = SystemParameters.VirtualScreenTop;
-                        double ScreenWidth = SystemParameters.VirtualScreenWidth;
-                        double ScreenHeight = SystemParameters.VirtualScreenHeight;
-            */
-            
-            System.Drawing.Image image = SnippingTool.FromRectangle(new System.Drawing.Rectangle(Convert.ToInt32(this.parentWindow.Left), Convert.ToInt32(this.parentWindow.Top), Convert.ToInt32(this.parentWindow.Width), Convert.ToInt32(this.parentWindow.Height)));
-            Byte[] imageBytes = ConversationPage.ImageToByte(image);
-            var values = new Dictionary<string, string>
-            {
-                { "userName", userName },
-                { "image", Convert.ToBase64String(imageBytes) },
-                { "time", time }
-            };
-            string json = JsonConvert.SerializeObject(values, Formatting.Indented);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-            string httpRegisterPost = "http://" + this.Ip + ":" + this.Port + "/statistics/email";
-            try
-            {
-                var response = await client.PostAsync(httpRegisterPost, content);
-                var responseString = await response.Content.ReadAsStringAsync();
-                await Dispatcher.BeginInvoke(new Action(delegate ()
-                {
-                    switch (response.StatusCode)
-                    {
-                        case HttpStatusCode.OK:
-                            //BackToLogin();
-                            break;
-                        case HttpStatusCode.BadRequest:
-                            if (responseString == "userName exists")
-                            {
-                                errorTxt.Text = "This userName already exists in the system";
-                            }
-                            else if (responseString == "mail exists")
-                            {
-                                errorTxt.Text = "This mail already exists in the system";
-                            }
-                            else if (responseString == "db failure")
-                            {
-                                errorTxt.Text = "Failure with connection to DB";
-                            }
-                            else
-                            {
-                                errorTxt.Text = responseString;
-                            }
-                            break;
-                        default:
-                            errorTxt.Text = "Problem with connection to server";
-                            break;
-                    }
-                }));
-            }
-            catch
-            {
-                await Dispatcher.BeginInvoke(new Action(delegate ()
-                {
-                    errorTxt.Text = "Problem with connection to server";
-                }));
-            }
-        }
-
 
         private void RadioButton_Last_Call_Checked(object sender, RoutedEventArgs e)
         {
             time = "last_call";
             UpdateCharts();
-            SendEmail();
         }
 
         private void RadioButton_Last_Week_Checked(object sender, RoutedEventArgs e)
@@ -468,5 +402,71 @@ namespace FaceItGUI.statistics
             });
         }
 
+        public async void SendEmail() //object sender, RoutedEventArgs e
+        {
+            var myFrame = SnippingTool.Snip();
+            /*            double Left = SystemParameters.VirtualScreenLeft;
+                        double Top = SystemParameters.VirtualScreenTop;
+                        double ScreenWidth = SystemParameters.VirtualScreenWidth;
+                        double ScreenHeight = SystemParameters.VirtualScreenHeight;
+            */
+
+            System.Drawing.Image image = SnippingTool.FromRectangle(myFrame.Frame); //new System.Drawing.Rectangle(Convert.ToInt32(this.parentWindow.Left), Convert.ToInt32(this.parentWindow.Top), Convert.ToInt32(this.parentWindow.Width), Convert.ToInt32(this.parentWindow.Height))
+            Byte[] imageBytes = ConversationPage.ImageToByte(image);
+            var values = new Dictionary<string, string>
+            {
+                { "userName", userName },
+                { "image", Convert.ToBase64String(imageBytes) },
+                { "time", time }
+            };
+            string json = JsonConvert.SerializeObject(values, Formatting.Indented);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            string httpRegisterPost = "http://" + this.Ip + ":" + this.Port + "/statistics/email";
+            try
+            {
+                var response = await client.PostAsync(httpRegisterPost, content);
+                var responseString = await response.Content.ReadAsStringAsync();
+                await Dispatcher.BeginInvoke(new Action(delegate ()
+                {
+                    switch (response.StatusCode)
+                    {
+                        case HttpStatusCode.OK:
+                            break;
+                        case HttpStatusCode.BadRequest:
+                            if (responseString == "userName exists")
+                            {
+                                errorTxt.Text = "This userName already exists in the system";
+                            }
+                            else if (responseString == "mail exists")
+                            {
+                                errorTxt.Text = "This mail already exists in the system";
+                            }
+                            else if (responseString == "db failure")
+                            {
+                                errorTxt.Text = "Failure with connection to DB";
+                            }
+                            else
+                            {
+                                errorTxt.Text = responseString;
+                            }
+                            break;
+                        default:
+                            errorTxt.Text = "Problem with connection to server";
+                            break;
+                    }
+                }));
+            }
+            catch
+            {
+                await Dispatcher.BeginInvoke(new Action(delegate ()
+                {
+                    errorTxt.Text = "Problem with connection to server";
+                }));
+            }
+        }
+        private void Email_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            SendEmail();
+        }
     }
 }

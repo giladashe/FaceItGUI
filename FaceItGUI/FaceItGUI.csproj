@@ -10,6 +10,7 @@
     <PackageReference Include="LiveCharts" Version="0.9.7" />
     <PackageReference Include="LiveCharts.Wpf" Version="0.9.7" />
     <PackageReference Include="MaterialDesignThemes" Version="4.1.0" />
+    <None Remove="Images\email_icon.png" />
     <None Remove="Images\facial-recognition-icon.jpg" />
     <None Remove="Images\Statistics_1.jpg" />
     <None Remove="Images\video_conference.jpg" />
@@ -33,6 +34,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Images\email_icon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Images\facial-recognition-icon.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Resource>

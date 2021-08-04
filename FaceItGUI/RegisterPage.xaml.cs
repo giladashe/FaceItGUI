@@ -50,14 +50,14 @@ namespace FaceItGUI
             {
                 await Dispatcher.BeginInvoke(new Action(delegate ()
                 {
-                    errorTxt.Text = "All fields are mandatory!";
+                    errorTxt.Content = "All fields are mandatory!";
                 }));
                 return;
             }
 
             await Dispatcher.BeginInvoke(new Action(delegate ()
             {
-                errorTxt.Text = string.Empty;
+                errorTxt.Content = string.Empty;
             }));
             //string salt = Hash.CreateSalt();
             //string hashedPassword = Hash.CreateHashedPassword(password, salt);
@@ -87,23 +87,23 @@ namespace FaceItGUI
                         case HttpStatusCode.BadRequest:
                             if (responseString == "userName exists")
                             {
-                                errorTxt.Text = "This userName already exists in the system";
+                                errorTxt.Content = "This userName already exists in the system";
                             }
                             else if (responseString == "mail exists")
                             {
-                                errorTxt.Text = "This mail already exists in the system";
+                                errorTxt.Content = "This mail already exists in the system";
                             }
                             else if (responseString == "db failure")
                             {
-                                errorTxt.Text = "Failure with connection to DB";
+                                errorTxt.Content = "Failure with connection to DB";
                             }
                             else
                             {
-                                errorTxt.Text = responseString;
+                                errorTxt.Content = responseString;
                             }
                             break;
                         default:
-                            errorTxt.Text = "Problem with connection to server";
+                            errorTxt.Content = "Problem with connection to server";
                             break;
                     }
                 }));
@@ -112,7 +112,7 @@ namespace FaceItGUI
             {
                 await Dispatcher.BeginInvoke(new Action(delegate ()
                 {
-                    errorTxt.Text = "Problem with connection to server";
+                    errorTxt.Content = "Problem with connection to server";
                 }));
             }
         }

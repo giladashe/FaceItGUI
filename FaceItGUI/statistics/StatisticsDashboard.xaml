@@ -82,9 +82,13 @@
         </Grid>
         <RadioButton x:Name="dummy_button" Content="dummy" FontWeight="Bold" Foreground="#3DDDC2" Grid.Row="2" VerticalAlignment="Top" Height="26" HorizontalAlignment="Left" Width="93" />
         <RadioButton x:Name="lastCallButton" Content="Last Call" FontWeight="Bold" Foreground="#3DDDC2" Margin="230,10,0,0" Grid.Row="1" VerticalAlignment="Top" Height="26" Checked="RadioButton_Last_Call_Checked" HorizontalAlignment="Left" Grid.RowSpan="2" Width="93" />
-        <RadioButton Content="Last Week" FontWeight="Bold" Foreground="#3DDDC2" HorizontalAlignment="Left" Margin="338,10,0,0" Grid.Row="1" VerticalAlignment="Top" Height="26" Width="93" Grid.ColumnSpan="2" Checked="RadioButton_Last_Week_Checked" />
-        <RadioButton Content="Last Month" FontWeight="Bold" Foreground="#3DDDC2" HorizontalAlignment="Left" Margin="30,10,0,0" Grid.Row="1" VerticalAlignment="Top" Height="26" Width="93" Grid.Column="1" Checked="RadioButton_Last_Month_Checked" Grid.RowSpan="2" />
-
+        <RadioButton Content="Last Week" FontWeight="Bold" Foreground="#3DDDC2" HorizontalAlignment="Left" Margin="345,10,0,0" Grid.Row="1" VerticalAlignment="Top" Height="26" Width="93" Grid.ColumnSpan="2" Checked="RadioButton_Last_Week_Checked" />
+        <RadioButton Content="Last Month" FontWeight="Bold" Foreground="#3DDDC2" HorizontalAlignment="Left" Margin="15,10,0,0" Grid.Row="1" VerticalAlignment="Top" Height="26" Width="93" Grid.Column="1" Checked="RadioButton_Last_Month_Checked" Grid.RowSpan="2" />
+        <Image Width="27" Height="27"
+               RenderOptions.BitmapScalingMode="Fant"
+               Source="/Images/email_icon.png"
+               Grid.Row="1" Margin="216,2,156,1" Grid.Column="1"
+               MouseLeftButtonDown="Email_MouseLeftButtonDown"/>
         <StackPanel Grid.Row="2">
             <TextBlock Text="My positive emotions vs negative"
                 Foreground="white"
