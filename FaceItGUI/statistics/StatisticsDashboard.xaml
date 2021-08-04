@@ -27,7 +27,7 @@
 
 
         <Grid Background="#0F0F2D"
-            Grid.ColumnSpan="2">
+            Grid.ColumnSpan="2" MouseDown="Grid_MouseDown">
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
@@ -46,7 +46,7 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
-            <Button Content="Bach To Menu"
+            <Button Content="Back To Menu"
                 Foreground="white"
                 FontSize="14"
                 FontWeight="Medium"
@@ -80,7 +80,6 @@
             </Button>
 
         </Grid>
-        <RadioButton x:Name="dummy_button" Content="dummy" FontWeight="Bold" Foreground="#3DDDC2" Grid.Row="2" VerticalAlignment="Top" Height="26" HorizontalAlignment="Left" Width="93" />
         <RadioButton x:Name="lastCallButton" Content="Last Call" FontWeight="Bold" Foreground="#3DDDC2" Margin="230,10,0,0" Grid.Row="1" VerticalAlignment="Top" Height="26" Checked="RadioButton_Last_Call_Checked" HorizontalAlignment="Left" Grid.RowSpan="2" Width="93" />
         <RadioButton Content="Last Week" FontWeight="Bold" Foreground="#3DDDC2" HorizontalAlignment="Left" Margin="345,10,0,0" Grid.Row="1" VerticalAlignment="Top" Height="26" Width="93" Grid.ColumnSpan="2" Checked="RadioButton_Last_Week_Checked" />
         <RadioButton Content="Last Month" FontWeight="Bold" Foreground="#3DDDC2" HorizontalAlignment="Left" Margin="15,10,0,0" Grid.Row="1" VerticalAlignment="Top" Height="26" Width="93" Grid.Column="1" Checked="RadioButton_Last_Month_Checked" Grid.RowSpan="2" />

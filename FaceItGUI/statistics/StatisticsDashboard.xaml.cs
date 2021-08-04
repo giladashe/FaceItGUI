@@ -15,6 +15,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Input;
 
 namespace FaceItGUI.statistics
 {
@@ -29,7 +30,7 @@ namespace FaceItGUI.statistics
         private LoginWindow parentWindow;
         private object loginContent;
         // private StatisticsHome statisticsHomePage;
-        private string time;
+        private string time = string.Empty;
         private int Port;
         private string Ip;
         private static readonly HttpClient client = new HttpClient();
@@ -404,13 +405,20 @@ namespace FaceItGUI.statistics
 
         public async void SendEmail() //object sender, RoutedEventArgs e
         {
+            if (time == string.Empty)
+            {
+                return;
+            }
             var myFrame = SnippingTool.Snip();
             /*            double Left = SystemParameters.VirtualScreenLeft;
                         double Top = SystemParameters.VirtualScreenTop;
                         double ScreenWidth = SystemParameters.VirtualScreenWidth;
                         double ScreenHeight = SystemParameters.VirtualScreenHeight;
             */
-
+            if (myFrame == null || myFrame.Frame == null)
+            {
+                return;
+            }
             System.Drawing.Image image = SnippingTool.FromRectangle(myFrame.Frame); //new System.Drawing.Rectangle(Convert.ToInt32(this.parentWindow.Left), Convert.ToInt32(this.parentWindow.Top), Convert.ToInt32(this.parentWindow.Width), Convert.ToInt32(this.parentWindow.Height))
             Byte[] imageBytes = ConversationPage.ImageToByte(image);
             var values = new Dictionary<string, string>
@@ -433,17 +441,13 @@ namespace FaceItGUI.statistics
                         case HttpStatusCode.OK:
                             break;
                         case HttpStatusCode.BadRequest:
-                            if (responseString == "userName exists")
+                            if (responseString == "user not exist")
                             {
-                                errorTxt.Text = "This userName already exists in the system";
+                                errorTxt.Text = "This user does not exist";
                             }
-                            else if (responseString == "mail exists")
+                            else if (responseString == "Error sending mail")
                             {
-                                errorTxt.Text = "This mail already exists in the system";
-                            }
-                            else if (responseString == "db failure")
-                            {
-                                errorTxt.Text = "Failure with connection to DB";
+                                errorTxt.Text = "DB problem";
                             }
                             else
                             {
@@ -468,5 +472,14 @@ namespace FaceItGUI.statistics
         {
             SendEmail();
         }
+
+        private void Grid_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                this.parentWindow.DragMove();
+            }
+        }
+
     }
 }
