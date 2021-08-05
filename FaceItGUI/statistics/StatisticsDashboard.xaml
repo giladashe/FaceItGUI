@@ -13,7 +13,7 @@
     <Grid x:Name="primary_grid">
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="20"/>
+            <RowDefinition Height="25"/>
             <RowDefinition Height="30"/>
             <RowDefinition/>
             <RowDefinition/>
@@ -27,7 +27,7 @@
 
 
         <Grid Background="#0F0F2D"
-            Grid.ColumnSpan="2" MouseDown="Grid_MouseDown">
+            Grid.ColumnSpan="2" Grid.Row="0" MouseDown="Grid_MouseDown">
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
@@ -50,9 +50,9 @@
                 Foreground="white"
                 FontSize="14"
                 FontWeight="Medium"
-                Margin="0,0,10,0"
-                Grid.Column="12"
-                Grid.ColumnSpan="2"
+                Margin="35,0,10,0"
+                Grid.Column="11"
+                Grid.ColumnSpan="3"
                 Click="BachToMenu">
 
                 <Button.Style>
@@ -70,7 +70,7 @@
 
                 <Button.Template>
                     <ControlTemplate TargetType="Button">
-                        <Border Width="100" Height="15"
+                        <Border Width="110" Height="18"
                                     CornerRadius="8"
                                     Background="{TemplateBinding Background}">
                             <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
@@ -196,7 +196,7 @@
         <TextBlock Grid.Row="4" Grid.ColumnSpan="2"
                 x:Name="errorTxt"
                 Text=""
-                Foreground="Red"
+                Foreground="#ff0033"
                 FontSize="15"
                 FontWeight="Medium"
                 Margin="5"

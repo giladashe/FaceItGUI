@@ -56,8 +56,9 @@
     </Page.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="5*"/>
-            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="563*"/>
+            <ColumnDefinition Width="244*"/>
+            <ColumnDefinition Width="93*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -65,7 +66,7 @@
             <RowDefinition Height="4*"/>
         </Grid.RowDefinitions>
         <Grid Background="#0F0F2D" Grid.Row="0"
-            Grid.ColumnSpan="2" MouseDown="Grid_MouseDown">
+            Grid.ColumnSpan="3" MouseDown="Grid_MouseDown" Margin="0,0,0,291" Grid.RowSpan="2">
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
@@ -83,35 +84,6 @@
                 <ColumnDefinition/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <!--<Button Content="Back to menu"
-                Foreground="white"
-                FontSize="14"
-                FontWeight="Medium"
-                Margin="200,10,0,0"  x:Name="stopButton" Click="StopButton_Click" >
-
-                <Button.Style>
-                    <Style TargetType="Button">
-                        <Setter Property="TextElement.FontFamily" Value="Fonts/#Dosis"/>
-                        <Setter Property="Background" Value="#FE6584"/>
-                        <Setter Property="Cursor" Value="Hand"/>
-                        <Style.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#FF4C70"/>
-                            </Trigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
-
-                <Button.Template>
-                    <ControlTemplate TargetType="Button">
-                        <Border Width="100" Height="25"
-                                    CornerRadius="12"
-                                    Background="{TemplateBinding Background}">
-                            <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Button.Template>
-            </Button>-->
             <Button Content="Back to menu"
                 Foreground="white"
                 FontSize="14"
@@ -145,13 +117,8 @@
             </Button>
 
         </Grid>
-        <Border Grid.Row="1" Grid.Column ="1" Background="#181735">
+        <Border Grid.Row="1" Background="#181735" Grid.ColumnSpan="3" Margin="562,0,0,0">
             <StackPanel>
-                <!--<Button x:Name="checkMatchBtn" Click="CheckMatchOnClick" Content="Finished snipping? Check matching!" Visibility="Hidden" FontSize="18" Background="Khaki"/>-->
-                <!--<Button x:Name="stopButton" Click="StopButton_Click" Width="230" Margin="0,30,0,0" HorizontalAlignment="center" FontSize="20" Background="OrangeRed">
-                Stop conversation
-            </Button>-->
-
                 <TextBlock x:Name="checking" HorizontalAlignment="Center" Foreground="White" FontSize="22" Text="Checking..." FontFamily="Fonts/#Dosis" Margin="0,30,0,0" Visibility="Hidden"/>
                 <TextBlock x:Name="matchText" HorizontalAlignment="Left" Foreground="White" FontSize="25" Text="" FontFamily="Fonts/#Dosis" Margin="0,30,0,0"/>
                 <TextBlock Width="300" Margin="0,80,0,0"  x:Name="errorTxt" HorizontalAlignment="Center" TextAlignment="Center" Foreground="#ff0033" FontSize="30" FontFamily="Fonts/#Dosis" TextWrapping="Wrap"
@@ -159,7 +126,7 @@
             </StackPanel>
         </Border>
         <Border Grid.Row="1" Grid.Column ="0" Background="#181735"/>
-        <Border x:Name="namesListBorder" Grid.Row="2" Grid.ColumnSpan="2" Background="#181735" >
+        <Border x:Name="namesListBorder" Grid.Row="1" Grid.ColumnSpan="3" Background="#181735" Margin="0,291,0,0" Grid.RowSpan="2" >
 
             <ListBox x:Name="namesList" Background="#181735" HorizontalContentAlignment="Center" BorderBrush="Transparent">
                 <ListBox.ItemTemplate>
@@ -183,12 +150,9 @@
             </ListBox>
         </Border>
 
-        <StackPanel Grid.Row="1" Grid.Column="0" Margin="40,20,0,0" VerticalAlignment="Center">
+        <StackPanel Grid.Row="1" Grid.Column="0" Margin="40,44,0,0" VerticalAlignment="Top">
             <TextBlock HorizontalAlignment="Center" Foreground="White" FontSize="30" Text="Welcome To FaceIt" FontFamily="Fonts/#Dosis" />
             <TextBlock x:Name="snipMeTxt" Margin="10" HorizontalAlignment="Center" Foreground="White" FontSize="23" Text="Please snip yourself!" FontFamily="Fonts/#Dosis" />
-            <!--<Button x:Name="meButton" Click="MyButton_Click" Width="230" FontSize="20" Background="GreenYellow" FontFamily="Fonts/#Dosis">
-                snip my video
-            </Button>-->
             <Button Content="Snip my video"
                 Foreground="white"
                 FontSize="14"
@@ -297,7 +261,7 @@ HorizontalContentAlignment="Left" FontFamily="Fonts/#Dosis" Visibility="Hidden"/
             </Button>-->
             <!--<Button x:Name="checkMatchBtn" Click="CheckMatchOnClick" Content="Finished snipping? Check matching!" Visibility="Hidden" FontSize="18" Background="Khaki"/>-->
         </StackPanel>
-        <Grid Grid.Row="2" Grid.Column="1" Margin="100, -65, -610, 85">
+        <Grid Grid.Row="1" Grid.Column="1" Margin="100,226,-610,85" Grid.ColumnSpan="2" Grid.RowSpan="2">
             <Grid.RenderTransform>
                 <RotateTransform Angle="50"/>
             </Grid.RenderTransform>

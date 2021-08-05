@@ -9,8 +9,9 @@
       Title="MainWindowPage" Background="#181735">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="25"/>
-            <RowDefinition/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="8.5*"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
@@ -19,7 +20,7 @@
         </Grid.ColumnDefinitions>
 
         <Grid Background="#0F0F2D"
-            Grid.ColumnSpan="2" MouseDown="Grid_MouseDown">
+            Grid.ColumnSpan="2" Grid.Row="0" MouseDown="Grid_MouseDown">
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
@@ -37,10 +38,9 @@
                 <ColumnDefinition/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-
             <Button Content="Exit"
                 Foreground="white"
-                FontSize="12"
+                FontSize="20"
                 FontWeight="Medium"
                 Margin="0,0,10,0"
                 Grid.Column="12"
@@ -61,7 +61,7 @@
 
                 <Button.Template>
                     <ControlTemplate TargetType="Button">
-                        <Border Width="75" Height="15"
+                        <Border Width="90" Height="25"
                                     CornerRadius="8"
                                     Background="{TemplateBinding Background}">
                             <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
@@ -70,11 +70,12 @@
                 </Button.Template>
             </Button>
 
+
         </Grid>
 
         <StackPanel Grid.Row="1" Grid.Column="0"
                 VerticalAlignment="Center" Grid.ColumnSpan="2"
-                Margin="60,0,60,0" Height="423">
+                Margin="60,0,60,0">
 
             <StackPanel>
                 <StackPanel Orientation="Horizontal"
@@ -179,10 +180,10 @@
                 </Button>
 
             </StackPanel>
-            <Label x:Name="errorTxt" FontSize="20" Margin="0,5,5,10" Content=""
-HorizontalContentAlignment="center"  VerticalContentAlignment="Center" Foreground="Red"  />
+          
         </StackPanel>
-
+        <Label Grid.Row="2" HorizontalAlignment="Center" Grid.ColumnSpan="2" x:Name="errorTxt" FontSize="20" Margin="0,0,5,10" Content=""
+HorizontalContentAlignment="center"  VerticalContentAlignment="Center" Foreground="#ff0033" FontFamily="Fonts/#Dosis"  />
         <Grid Grid.Column="1"
           Grid.RowSpan="2"
           Margin="160, -365, -610, 85"
@@ -239,11 +240,5 @@ HorizontalContentAlignment="center"  VerticalContentAlignment="Center" Foregroun
             </StackPanel>
         </Grid>
     </Grid>
-    <!--<StackPanel>
-        <Label x:Name="welcometxt" Content="MainWindow" FontSize="70" HorizontalAlignment="Center" FontWeight="Bold" Margin="2,5,2,0" VerticalContentAlignment="Bottom"/>
-        <Button HorizontalAlignment="Center" FontSize="50" Click="StartConversation">Start conversation</Button>
-        <Button HorizontalAlignment="Center" FontSize="50" Click="ShowStatistics">Show Statistics</Button>
-        <Button HorizontalAlignment="Center" FontSize="50" Click="Exit">Exit</Button>
-        <Label x:Name="errorTxt" FontSize="20" Margin="0,5" Content="" HorizontalContentAlignment="center"  Foreground="Red"/>
-    </StackPanel>-->
+
 </Page>

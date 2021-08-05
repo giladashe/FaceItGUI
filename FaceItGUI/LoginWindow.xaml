@@ -12,17 +12,21 @@
         >
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="25"/>
-            <RowDefinition/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="10*"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-            <ColumnDefinition/>
+            <ColumnDefinition Width="84*"/>
+            <ColumnDefinition Width="366*"/>
+            <ColumnDefinition Width="323*"/>
+            <ColumnDefinition Width="76*"/>
+            <ColumnDefinition Width="51*"/>
         </Grid.ColumnDefinitions>
 
+        
         <Grid Background="#0F0F2D"
-            Grid.ColumnSpan="2" MouseDown="Grid_MouseDown">
+            Grid.ColumnSpan="5" Grid.Row="0" MouseDown="Grid_MouseDown">
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
@@ -43,11 +47,16 @@
 
             <Button Content="Exit"
                 Foreground="white"
-                FontSize="12"
+                FontSize="20"
                 FontWeight="Medium"
                 Margin="0,0,10,0"
                 Grid.Column="12"
-                Grid.ColumnSpan="2" Click="ExitClick">
+                Grid.ColumnSpan="2" 
+                Click="ExitClick"
+                VerticalContentAlignment="Center"
+                HorizontalContentAlignment="Center"
+                    
+                    >
 
                 <Button.Style>
                     <Style TargetType="Button">
@@ -64,7 +73,7 @@
 
                 <Button.Template>
                     <ControlTemplate TargetType="Button">
-                        <Border Width="75" Height="15"
+                        <Border Width="90" Height="25"
                                     CornerRadius="8"
                                     Background="{TemplateBinding Background}">
                             <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
@@ -72,12 +81,11 @@
                     </ControlTemplate>
                 </Button.Template>
             </Button>
-
         </Grid>
 
         <StackPanel Grid.Row="1"
                 VerticalAlignment="Center"
-                Margin="60">
+                Margin="60,0,60,0" Grid.ColumnSpan="2">
 
             <StackPanel>
                 <StackPanel Orientation="Horizontal"
@@ -179,14 +187,14 @@
                 </Button>
 
             </StackPanel>
-            <Label x:Name="errorTxt" FontSize="20" Margin="0,5,5,10" Content=""
-            HorizontalContentAlignment="center"  VerticalContentAlignment="Center" Foreground="Red"  />
+            <Label x:Name="errorTxt" FontSize="25" Margin="0,25,5,10" Content=""
+            HorizontalContentAlignment="center"  VerticalContentAlignment="Center" Foreground="#ff0033" FontFamily="Fonts/#Dosis" />
         </StackPanel>
 
-        <Grid Grid.Column="1"
+        <Grid Grid.Column="2"
           Grid.RowSpan="2"
           Margin="160, -365, -610, 85"
-          Panel.ZIndex="0">
+          Panel.ZIndex="-1" Grid.ColumnSpan="3">
 
             <Grid.RenderTransform>
                 <RotateTransform Angle="50"/>

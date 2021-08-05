@@ -8,43 +8,11 @@
       Title="RegisterPage" Height="500" Width="900"
       Background="#181735">
 
-    <!--StackPanel>
-        <Label Content="Registration" FontSize="100" HorizontalAlignment="Center" FontWeight="Bold" Margin="2,5,2,0" VerticalContentAlignment="Bottom"/>
-        <Grid Margin="2" HorizontalAlignment="Center" >
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="2*"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition />
-                <RowDefinition/>
-                <RowDefinition/>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
-            <Label FontSize="25" Grid.Row="0" Grid.Column="0" Margin="0,5" Content="Username : " VerticalContentAlignment="Center"
-HorizontalContentAlignment="Left"/>
-            <TextBox Grid.Row="0" Grid.Column="1" x:Name="txtUserName" Margin="0,5" Width="150" VerticalContentAlignment="Center"
-HorizontalContentAlignment="Left"/>
-
-            <Label FontSize="25" Grid.Row="1" Grid.Column="0" Margin="0,5,0,5" Content="Password : " VerticalContentAlignment="Center" HorizontalContentAlignment="Left" HorizontalAlignment="Left"/>
-            <PasswordBox Grid.Row="1" Grid.Column="1" x:Name="txtPassword" Margin="0,5" Width="150" VerticalContentAlignment="Center" HorizontalContentAlignment="Left"/>
-            <Label FontSize="25" Grid.Row="2" Grid.Column="0" Margin="0,5,0,5" Content="Email : " VerticalContentAlignment="Center" HorizontalContentAlignment="Left" HorizontalAlignment="Left"/>
-            <TextBox Grid.Row="2" Grid.Column="1" x:Name="txtEmail" Margin="0,5" Width="150" VerticalContentAlignment="Center" HorizontalContentAlignment="Left"/>
-
-
-        </Grid>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <Button Content="Register"  FontSize="20" x:Name="btnRegister" Margin="2,10" Width="130" Background="#80ff00" Foreground="Black" BorderBrush="White" Click="RegisterUser"/>
-            <Button Content="Back To login"  FontSize="20" x:Name="btnBack" Margin="2,10" Width="130"  Background="#ff2d2d" Foreground="Black" BorderBrush="White" Click="Exit"/>
-        </StackPanel>
-        <TextBlock Text="" HorizontalAlignment="Center" x:Name="errorTxt" Foreground="#ff2d2d" FontSize="30"></TextBlock>
-
-    </-->
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="25"/>
-            <RowDefinition/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="10*"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
@@ -53,7 +21,7 @@ HorizontalContentAlignment="Left"/>
         </Grid.ColumnDefinitions>
 
         <Grid Background="#0F0F2D"
-            Grid.ColumnSpan="2">
+            Grid.ColumnSpan="5" Grid.Row="0" MouseDown="Grid_MouseDown">
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
@@ -78,7 +46,12 @@ HorizontalContentAlignment="Left"/>
                 FontWeight="Medium"
                 Margin="0,0,10,0"
                 Grid.Column="12"
-                Grid.ColumnSpan="2" Click="Exit">
+                Grid.ColumnSpan="2" 
+                Click="Exit"
+                VerticalContentAlignment="Center"
+                HorizontalContentAlignment="Center"
+                    
+                    >
 
                 <Button.Style>
                     <Style TargetType="Button">
@@ -95,7 +68,7 @@ HorizontalContentAlignment="Left"/>
 
                 <Button.Template>
                     <ControlTemplate TargetType="Button">
-                        <Border Width="80" Height="20"
+                        <Border Width="90" Height="25"
                                     CornerRadius="8"
                                     Background="{TemplateBinding Background}">
                             <ContentPresenter VerticalAlignment="Center" HorizontalAlignment="Center"/>
@@ -103,8 +76,8 @@ HorizontalContentAlignment="Left"/>
                     </ControlTemplate>
                 </Button.Template>
             </Button>
-
         </Grid>
+
 
         <StackPanel Grid.Row="1"
                 VerticalAlignment="Center"
@@ -188,14 +161,14 @@ HorizontalContentAlignment="Left"/>
                 </Button.Template>
             </Button>
 
-            <Label x:Name="errorTxt" FontSize="20" Margin="0,5,5,10" Content=""
-            HorizontalContentAlignment="center"  VerticalContentAlignment="Center" Foreground="Red"  />
+            <Label x:Name="errorTxt" FontSize="20" Margin="0,5,5,10" Content="Connection Problem"
+            HorizontalContentAlignment="center"  VerticalContentAlignment="Center" Foreground="#ff0033" FontFamily="Fonts/#Dosis" />
         </StackPanel>
 
         <Grid Grid.Column="1"
           Grid.RowSpan="2"
           Margin="160, -365, -610, 85"
-          Panel.ZIndex="0">
+          Panel.ZIndex="-1">
 
             <Grid.RenderTransform>
                 <RotateTransform Angle="50"/>

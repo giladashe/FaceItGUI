@@ -127,5 +127,12 @@ namespace FaceItGUI
             this.loginWin.Content = loginContent;
         }
 
+        private void Grid_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                this.loginWin.DragMove();
+            }
+        }
     }
 }
