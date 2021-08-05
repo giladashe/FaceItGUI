@@ -4,21 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Forms;
 using System.Threading;
 using System.IO;
-using System.Web;
 using System.Drawing;
 using System.Net.Sockets;
 using System.Configuration;
 using System.Drawing.Drawing2D;
-using System.ComponentModel;
 using System.Windows.Controls;
 using System.Reflection;
 using System.Net.Http;
@@ -126,10 +118,6 @@ namespace FaceItGUI
                     errorsMutex.WaitOne();
                     errors.Enqueue(message);
                     errorsMutex.ReleaseMutex();
-                    /*if (Math.Abs((DateTime.Now - this.lastTime).TotalSeconds) > 5 && errorTxt.Text != message)
-                    {
-                        errorTxt.Text = message;
-                    }*/
                 }));
                 return;
             }
@@ -150,10 +138,6 @@ namespace FaceItGUI
                     errorsMutex.WaitOne();
                     errors.Enqueue(message);
                     errorsMutex.ReleaseMutex();
-                    /*if (Math.Abs((DateTime.Now - this.lastTime).TotalSeconds) > 5 && errorTxt.Text != message)
-                    {
-                        errorTxt.Text = message;
-                    }*/
                 }));
                 return;
             }
@@ -182,10 +166,6 @@ namespace FaceItGUI
                     errorsMutex.WaitOne();
                     errors.Enqueue(message);
                     errorsMutex.ReleaseMutex();
-                   /* if (Math.Abs((DateTime.Now - this.lastTime).TotalSeconds) > 5 && errorTxt.Text != message)
-                    {
-                        errorTxt.Text = message;
-                    }*/
                 }));
                 return;
             }
@@ -197,9 +177,7 @@ namespace FaceItGUI
                 meButton.Visibility = Visibility.Hidden;
                 snipMeTxt.Visibility = Visibility.Hidden;
                 othersTxt.Visibility = Visibility.Visible;
-                //todo: 
                 borderNameBox.Visibility = Visibility.Visible;
-                //nameBox.Visibility = Visibility.Visible;
                 othersButton.Visibility = Visibility.Visible;
 
             }
@@ -217,10 +195,8 @@ namespace FaceItGUI
                     Thread.Sleep(500);
                     try
                     {
-                        //long localDate = DateTime.Now.Ticks;
                         string localDateStr = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss");
                         int numOfEndLines = 2;
-                        //string localDateStr = localDate.ToString();
                         System.Drawing.Image image = SnippingTool.FromRectangle(myFrame.Frame);
                         while (ImageToByte(image).Length + currentName.Length + localDateStr.Length + numOfEndLines > maxUdpDatagramSize)
                         {
@@ -238,11 +214,6 @@ namespace FaceItGUI
                             errorsMutex.WaitOne();
                             errors.Enqueue(message);
                             errorsMutex.ReleaseMutex();
-                            //if (Math.Abs((DateTime.Now - this.lastTime).TotalSeconds) > 5 && errorTxt.Text != message)
-                            //{
-                            //    errorTxt.Text = message;
-                            //}
-
                         }));
                         System.Diagnostics.Debug.WriteLine("problem: " + excep.Message);
                     }
@@ -309,10 +280,6 @@ namespace FaceItGUI
                             errorsMutex.WaitOne();
                             errors.Enqueue(message);
                             errorsMutex.ReleaseMutex();
-                           /* if (Math.Abs((DateTime.Now - this.lastTime).TotalSeconds) > 5 && errorTxt.Text != message)
-                            {
-                                errorTxt.Text = message;
-                            }*/
                         }));
                         BackToMainWindow();
                         break;
@@ -322,12 +289,7 @@ namespace FaceItGUI
                             string message = "Connection problem with server";
                             errorsMutex.WaitOne();
                             errors.Enqueue(message);
-                            errorsMutex.ReleaseMutex();
-                            /*if (Math.Abs((DateTime.Now - this.lastTime).TotalSeconds) > 5 && errorTxt.Text != message)
-                            {
-                                errorTxt.Text = message;
-                            }*/
-                           
+                            errorsMutex.ReleaseMutex();                           
                         }));
                         BackToMainWindow();
                         break;
@@ -341,11 +303,6 @@ namespace FaceItGUI
                     errorsMutex.WaitOne();
                     errors.Enqueue(message);
                     errorsMutex.ReleaseMutex();
-                    /*if (Math.Abs((DateTime.Now - this.lastTime).TotalSeconds) > 5 && errorTxt.Text != message)
-                    {
-                        errorTxt.Text = message;
-                    }*/
-
                 }));
                 BackToMainWindow();
             }
@@ -417,21 +374,6 @@ namespace FaceItGUI
                         {
                             Dispatcher.BeginInvoke(new Action(delegate ()
                             {
-                               /* //todo: check this
-                                string nameError = name;
-                                if (name == "You")
-                                {
-                                    nameError = "your";
-                                }
-                                else
-                                {
-                                    nameError = $"{name}'s";
-                                }
-                                string message = $"Couldn't recognize\n {nameError} face";
-                                if (Math.Abs((DateTime.Now - this.lastTime).TotalSeconds) > 5 && errorTxt.Text != message)
-                                {
-                                    errorTxt.Text = message;
-                                }*/
                                 ((NameInList)namesList.Items[index]).Feeling = "Not Recognized";
                                 missesRecognition[name] = 0;
                             }));
@@ -488,10 +430,6 @@ namespace FaceItGUI
                         errorsMutex.WaitOne();
                         errors.Enqueue(message);
                         errorsMutex.ReleaseMutex();
-                       /* if (Math.Abs((DateTime.Now - this.lastTime).TotalSeconds) > 5 && errorTxt.Text != message)
-                        {
-                            errorTxt.Text = message;
-                        }*/
                         System.Diagnostics.Debug.WriteLine(e.Message);
 
                     }));
@@ -518,9 +456,7 @@ namespace FaceItGUI
         {
             othersButton.Visibility = Visibility.Hidden;
             othersTxt.Visibility = Visibility.Hidden;
-            //TODO:
             borderNameBox.Visibility = Visibility.Hidden;
-            //nameBox.Visibility = Visibility.Hidden;
             checkMatchBtn.Visibility = Visibility.Hidden;
             othersButton.Visibility = Visibility.Hidden;
             checking.Visibility = Visibility.Visible;
@@ -565,10 +501,6 @@ namespace FaceItGUI
                     return;
                 checksMutex.WaitOne();
                 allChecks++;
-                // average
-                //int avgMatch = sumMatch / numOfPeopleToCheck;
-
-                // if (Math.Abs(userVibe - avgMatch) <= diff)
                 // match most of participants
                 if (matchedPeople >= numOfPeopleToCheck / 2.0)
                 {

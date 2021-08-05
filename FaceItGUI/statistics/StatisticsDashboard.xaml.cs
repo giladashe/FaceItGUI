@@ -29,7 +29,6 @@ namespace FaceItGUI.statistics
 
         private LoginWindow parentWindow;
         private object loginContent;
-        // private StatisticsHome statisticsHomePage;
         private string time = string.Empty;
         private int Port;
         private string Ip;
@@ -64,14 +63,14 @@ namespace FaceItGUI.statistics
                 new ColumnSeries
                 {
                     Title = "positive",
-                    Values = new ChartValues<double> { 0 } //positivePercents, Convert.ToDouble("66.3")
+                    Values = new ChartValues<double> { 0 } 
                 }
             };
 
             HappySadSeriesCollection.Add(new ColumnSeries
             {
                 Title = "negative",
-                Values = new ChartValues<double> { 0 } //negativePercents
+                Values = new ChartValues<double> { 0 } 
             });
 
 
@@ -143,21 +142,6 @@ namespace FaceItGUI.statistics
             Formatter = value => value.ToString("N");
 
             DataContext = this;
-
-/*            System.Windows.Point topLeft = dummy_button.PointToScreen(new System.Windows.Point(0, 0));
-            double x = this.parentWindow.Left; //System.Windows.Point
-            double y = this.parentWindow.Top;
-            var pass = 1;
-*/
-            //System.Windows.Forms.Screen r = System.Windows.Forms.Screen.FromHandle(new WindowInteropHelper(parentWindow).Handle);
-            /*            double Left = SystemParameters.VirtualScreenLeft;
-                        double Top = SystemParameters.VirtualScreenTop;
-                        double ScreenWidth = SystemParameters.VirtualScreenWidth;
-                        double ScreenHeight = SystemParameters.VirtualScreenHeight;
-            */
-            //var bounds = Screen.PrimaryScreen.Bounds;
-            //lastCallButton.IsChecked = true;
-
         }
 
 
@@ -417,11 +401,6 @@ namespace FaceItGUI.statistics
                 return;
             }
             var myFrame = SnippingTool.Snip();
-            /*            double Left = SystemParameters.VirtualScreenLeft;
-                        double Top = SystemParameters.VirtualScreenTop;
-                        double ScreenWidth = SystemParameters.VirtualScreenWidth;
-                        double ScreenHeight = SystemParameters.VirtualScreenHeight;
-            */
             if (myFrame == null || myFrame.Frame == null)
             {
                 return;

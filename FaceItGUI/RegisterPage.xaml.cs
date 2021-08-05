@@ -1,20 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Net.Http;
 using System.Configuration;
 using System.Net;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
 
 namespace FaceItGUI
 {
@@ -59,18 +50,12 @@ namespace FaceItGUI
             {
                 errorTxt.Content = string.Empty;
             }));
-            //string salt = Hash.CreateSalt();
-            //string hashedPassword = Hash.CreateHashedPassword(password, salt);
             var values = new Dictionary<string, string>
             {
                 { "userName", userName },
                 { "password", password },
                 { "email", email }
             };
-            //WebRequestHandler handler = new WebRequestHandler();
-            //X509Certificate certificate = X509Certificate.CreateFromCertFile("");
-            //handler.ClientCertificates.Add(certificate);
-            //HttpClient client = new HttpClient(handler);
             var content = new FormUrlEncodedContent(values);
             string httpRegisterPost = "http://" + this.Ip + ":" + this.Port + "/register";
             try

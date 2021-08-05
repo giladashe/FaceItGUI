@@ -220,12 +220,6 @@ HorizontalContentAlignment="Left" FontFamily="Fonts/#Dosis" Visibility="Hidden"/
                 </Button>
 
             </DockPanel>
-            <!--<TextBlock x:Name="othersTxt" HorizontalAlignment="Center" Foreground="White" FontSize="25" Text="Want to snip others?" Visibility="Hidden"/>
-            <TextBox  x:Name="nameBox" Visibility="Hidden"/>-->
-            <!--<Button x:Name="othersButton" Click="MyButton_Click" Width="230" FontSize="20" Background="GreenYellow" Visibility="Hidden">
-                press after writing name
-            </Button>-->
-            <!--<Button x:Name="checkMatchBtn" Click="CheckMatchOnClick" Width="230" Margin="0,30,0,0" HorizontalAlignment="center" FontSize="20" Background="OrangeRed" Content="Finished snipping? Check matching!" />-->
             <Button x:Name="checkMatchBtn" Content="Finished? Check matching!"
                 Foreground="white"
                 FontSize="14"
@@ -256,10 +250,6 @@ HorizontalContentAlignment="Left" FontFamily="Fonts/#Dosis" Visibility="Hidden"/
                 </Button.Template>
             </Button>
 
-            <!--<Button x:Name="stopButton" Click="StopButton_Click" Width="230" Margin="0,30,0,0" HorizontalAlignment="center" FontSize="20" Background="OrangeRed">
-                Stop conversation
-            </Button>-->
-            <!--<Button x:Name="checkMatchBtn" Click="CheckMatchOnClick" Content="Finished snipping? Check matching!" Visibility="Hidden" FontSize="18" Background="Khaki"/>-->
         </StackPanel>
         <Grid Grid.Row="1" Grid.Column="1" Margin="100,226,-610,85" Grid.ColumnSpan="2" Grid.RowSpan="2">
             <Grid.RenderTransform>

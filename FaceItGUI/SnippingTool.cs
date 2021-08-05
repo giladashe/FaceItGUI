@@ -88,7 +88,10 @@ namespace FaceItGUI
         public Image GetImage()
         {
             // Complete the snip on mouse-up
-            // check null!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            if (Frame == null)
+            {
+                return null;
+            }
             if (Frame.Width <= 0 || Frame.Height <= 0) return null;
             System.Diagnostics.Debug.WriteLine("here 1");
 

@@ -24,19 +24,6 @@ namespace FaceItGUI
             }
         }
 
-       /* public string Recognized
-        {
-            get
-            {
-                return _recognized;
-            }
-            set
-            {
-                _recognized = value;
-                NotifyPropertyChanged("Recognized");
-            }
-        }*/
-
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void NotifyPropertyChanged(String info)
