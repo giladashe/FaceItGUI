@@ -93,22 +93,17 @@ namespace FaceItGUI
                 return null;
             }
             if (Frame.Width <= 0 || Frame.Height <= 0) return null;
-            System.Diagnostics.Debug.WriteLine("here 1");
 
             Image image = new Bitmap(Frame.Width, Frame.Height);
-            System.Diagnostics.Debug.WriteLine("here 2");
 
             using (Graphics gr = Graphics.FromImage(image))
             {
-                System.Diagnostics.Debug.WriteLine("here 3");
 
                 gr.DrawImage(this.BackgroundImage, new Rectangle(0, 0, image.Width, image.Height),
                     Frame, GraphicsUnit.Pixel);
-                System.Diagnostics.Debug.WriteLine("here 4");
 
             }
             DialogResult = DialogResult.OK;
-            System.Diagnostics.Debug.WriteLine("here 5");
 
             return image;
         }
