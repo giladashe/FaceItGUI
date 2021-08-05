@@ -137,10 +137,10 @@
                         </TransformGroup>
                     </lvc:CartesianChart.RenderTransform>
                     <lvc:CartesianChart.AxisX>
-                        <lvc:Axis Title="percent" Labels="{Binding BarLabels}"></lvc:Axis>
+                        <lvc:Axis Title="match" Labels="{Binding BarLabels}"></lvc:Axis>
                     </lvc:CartesianChart.AxisX>
                     <lvc:CartesianChart.AxisY>
-                        <lvc:Axis Title="match" LabelFormatter="{Binding Formatter}"></lvc:Axis>
+                        <lvc:Axis Title="percent" LabelFormatter="{Binding Formatter}"></lvc:Axis>
                     </lvc:CartesianChart.AxisY>
                 </lvc:CartesianChart>
             </Grid>
@@ -149,7 +149,7 @@
 
         <StackPanel Grid.Row="2" Grid.Column="1">
             <TextBlock
-                Text="Others positive"
+                Text="Positive others"
                 Foreground="white"
                 FontSize="17"
                 FontWeight="Medium"
@@ -167,10 +167,10 @@
                         </TransformGroup>
                     </lvc:CartesianChart.RenderTransform>
                     <lvc:CartesianChart.AxisX>
-                        <lvc:Axis Title="percent" Labels="{Binding BarLabels}"></lvc:Axis>
+                        <lvc:Axis Title="match" Labels="{Binding BarLabels}"></lvc:Axis>
                     </lvc:CartesianChart.AxisX>
                     <lvc:CartesianChart.AxisY>
-                        <lvc:Axis Title="match" LabelFormatter="{Binding Formatter}"></lvc:Axis>
+                        <lvc:Axis Title="percent" LabelFormatter="{Binding Formatter}"></lvc:Axis>
                     </lvc:CartesianChart.AxisY>
                 </lvc:CartesianChart>
             </Grid>

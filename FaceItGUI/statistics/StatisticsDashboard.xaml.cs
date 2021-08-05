@@ -262,8 +262,15 @@ namespace FaceItGUI.statistics
                 {
                     case HttpStatusCode.OK:
                         errorTxt.Text = "";
-                        JObject json = JObject.Parse(responseString);
-                        userMatchPercent = json["percents"].ToString();
+                        if (responseString == "no checks has been detected")
+                        {
+                            userMatchPercent = "0";
+                        }
+                        else
+                        {
+                            JObject json = JObject.Parse(responseString);
+                            userMatchPercent = json["percents"].ToString();
+                        }
                         break;
                     case HttpStatusCode.BadRequest:
                         errorTxt.Text = "DB connection problem"; 

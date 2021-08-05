@@ -161,7 +161,7 @@
                 </Button.Template>
             </Button>
 
-            <Label x:Name="errorTxt" FontSize="20" Margin="0,5,5,10" Content="Connection Problem"
+            <Label x:Name="errorTxt" FontSize="20" Margin="0,5,5,10" Content=""
             HorizontalContentAlignment="center"  VerticalContentAlignment="Center" Foreground="#ff0033" FontFamily="Fonts/#Dosis" />
         </StackPanel>
 

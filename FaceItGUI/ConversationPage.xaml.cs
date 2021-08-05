@@ -250,7 +250,7 @@ namespace FaceItGUI
 
 
             }).Start();
-            this.parentWindow.WindowState = WindowState.Minimized;
+            // this.parentWindow.WindowState = WindowState.Minimized;
             this.parentWindow.Show();
 
         }
