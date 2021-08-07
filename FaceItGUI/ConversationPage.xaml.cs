@@ -365,6 +365,7 @@ namespace FaceItGUI
                     var message = Encoding.ASCII.GetString(result.Buffer, 0, result.Buffer.Length);
                     await Dispatcher.BeginInvoke(new Action(delegate ()
                     {
+                        // check what is the response from the server on the image
                         bool goodVibe = (message == "happy" || message == "surprise");
                         bool neutral = (message == "neutral");
                         bool foundFace = false;
@@ -377,6 +378,7 @@ namespace FaceItGUI
                                 continue;
                             }
 
+                            // increase emotion by 1 and sets misses to 0 (now recognized)
                             if (property.Name.ToLower() == message)
                             {
                                 int value = (int)property.GetValue(allBehaviors[name]);
@@ -389,11 +391,13 @@ namespace FaceItGUI
 
                         }
 
+                        // if not detected misses increased by 1 
                         if (!foundFace)
                         {
                             missesRecognition[name]++;
                         }
 
+                        // if there are a lot of misses put it in UI
                         if (missesRecognition[name] >= maxMisses)
                         {
                             Dispatcher.BeginInvoke(new Action(delegate ()
@@ -404,6 +408,7 @@ namespace FaceItGUI
                             return;
                         }
 
+                        // if need to check match - checks if the user matches at least half of the participants
                         if (startCheck)
                         {
                             // check matching to others every 10 rounds
@@ -489,8 +494,10 @@ namespace FaceItGUI
 
         public void AddAndCheckMatch(string name, bool neutral, bool goodVibe, bool isLoginUser, bool needToCheck)
         {
+            // field for matching
             if (!neutral)
             {
+                // plus to match if it's a positive and else - minus 
                 if (goodVibe)
                 {
                     allBehaviors[name].Match++;
@@ -500,6 +507,7 @@ namespace FaceItGUI
                     allBehaviors[name].Match--;
                 }
             }
+            // if it's the user check match!
             if (isLoginUser && needToCheck)
             {
                 Behaviors userBehaviors = allBehaviors[name];
@@ -512,6 +520,7 @@ namespace FaceItGUI
                     Behaviors behaviorVal = behavior.Value;
                     if (behavior.Key != name || behaviorVal.CheckMatch == false)
                     {
+                        // checks difference between user and current participant
                         if (Math.Abs(userVibe - behaviorVal.Match) <= diff)
                         {
                             matchedPeople++;
@@ -528,6 +537,7 @@ namespace FaceItGUI
                 // match most of participants
                 if (matchedPeople >= numOfPeopleToCheck / 2.0)
                 {
+                    // to send at end of conversation
                     allMatches++;
                     //good match
                     Dispatcher.BeginInvoke(new Action(delegate ()
@@ -565,6 +575,7 @@ namespace FaceItGUI
 
         private void ShowErrors()
         {
+            // loop for error queue
             while (!stop)
             {
                 while (errors.Count() > 0)
