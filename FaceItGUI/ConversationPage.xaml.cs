@@ -123,12 +123,14 @@ namespace FaceItGUI
             }
             else
             {
+                // get name from textbox
                 await Dispatcher.BeginInvoke(new Action(delegate ()
                 {
                     currentName = nameBox.Text;
                     nameBox.Text = string.Empty;
                 }));
             }
+            // name already exist - error
             if (namesMap.ContainsKey(currentName))
             {
                 System.Diagnostics.Debug.WriteLine(currentName + " already exists");
@@ -144,20 +146,26 @@ namespace FaceItGUI
             this.parentWindow.ShowActivated = false;
             this.parentWindow.Hide();
             Thread.Sleep(300);
+            // user snips
             var myFrame = SnippingTool.Snip();
             bool isLoginUser = false;
+            // If he didn't snip anything - return
             if (myFrame == null)
             {
                 this.parentWindow.Show();
                 return;
             }
+            // if it's the first one to snip starting loop that empty the error textbox
             if (!startedConversation)
             {
                 this.blankSpaceTimer = SetTimer();
                 this.blankSpaceTimer.Start();
             }
             startedConversation = true;
+            // add name to the screen and the dictionaries
             int index = await AddToNamesList(currentName);
+            
+            // can't insert to list because he already exists
             if (index == -1)
             {
                 await Dispatcher.BeginInvoke(new Action(delegate ()
@@ -171,6 +179,7 @@ namespace FaceItGUI
             }
             int maxUdpDatagramSize = 65515;
 
+            // sets visibility in UI
             if (currentName == "You")
             {
                 isLoginUser = true;
@@ -186,6 +195,7 @@ namespace FaceItGUI
                 checkMatchBtn.Visibility = Visibility.Visible;
             }
 
+            // Opens new thread for snipped participant
             new Thread(async delegate ()
             {
                 int round = 0;
@@ -197,15 +207,19 @@ namespace FaceItGUI
                     {
                         string localDateStr = DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss");
                         int numOfEndLines = 2;
+                        // Gets image from frame snipped
                         System.Drawing.Image image = SnippingTool.FromRectangle(myFrame.Frame);
+                        // ReduceImageSize if it's to big for udp packet
                         while (ImageToByte(image).Length + currentName.Length + localDateStr.Length + numOfEndLines > maxUdpDatagramSize)
                         {
                             image = ReduceImageSize(0.9, image);
                         }
+                        // send image to server
                         WriteToServer(image, currentName, localDateStr, index, round, isLoginUser);
 
                         round++;
                     }
+                    // error if there was a connection problem
                     catch (Exception excep)
                     {
                         await Dispatcher.BeginInvoke(new Action(delegate ()
@@ -249,11 +263,6 @@ namespace FaceItGUI
 
         public async void StopButton_Click(object sender, RoutedEventArgs e)
         {
-            if (!startedConversation)
-            {
-                BackToMainWindow();
-                return;
-            }
             checksMutex.WaitOne();
             var values = new Dictionary<string, string>
             {
@@ -270,7 +279,10 @@ namespace FaceItGUI
                 switch (response.StatusCode)
                 {
                     case HttpStatusCode.OK:
-                        this.blankSpaceTimer.Stop();
+                        if (this.blankSpaceTimer != null)
+                        {
+                            this.blankSpaceTimer.Stop();
+                        }
                         BackToMainWindow();
                         break;
                     case HttpStatusCode.BadRequest:
@@ -281,6 +293,10 @@ namespace FaceItGUI
                             errors.Enqueue(message);
                             errorsMutex.ReleaseMutex();
                         }));
+                        if (this.blankSpaceTimer != null)
+                        {
+                            this.blankSpaceTimer.Stop();
+                        }
                         BackToMainWindow();
                         break;
                     default:
@@ -291,6 +307,10 @@ namespace FaceItGUI
                             errors.Enqueue(message);
                             errorsMutex.ReleaseMutex();                           
                         }));
+                        if (this.blankSpaceTimer != null)
+                        {
+                            this.blankSpaceTimer.Stop();
+                        }
                         BackToMainWindow();
                         break;
                 }
@@ -304,6 +324,10 @@ namespace FaceItGUI
                     errors.Enqueue(message);
                     errorsMutex.ReleaseMutex();
                 }));
+                if (this.blankSpaceTimer != null)
+                {
+                    this.blankSpaceTimer.Stop();
+                }
                 BackToMainWindow();
             }
 
