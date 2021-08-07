@@ -167,7 +167,7 @@
                         </TransformGroup>
                     </lvc:CartesianChart.RenderTransform>
                     <lvc:CartesianChart.AxisX>
-                        <lvc:Axis Title="match" Labels="{Binding BarLabels}"></lvc:Axis>
+                        <lvc:Axis Title="positive" Labels="{Binding BarLabels}"></lvc:Axis>
                     </lvc:CartesianChart.AxisX>
                     <lvc:CartesianChart.AxisY>
                         <lvc:Axis Title="percent" LabelFormatter="{Binding Formatter}"></lvc:Axis>
